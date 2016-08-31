@@ -1,6 +1,6 @@
 # ElixirMaze
 
-**TODO: Add description**
+Overambitious Elixir Port of my ruby-maze project.At least I'll try!
 
 ## Installation
 
