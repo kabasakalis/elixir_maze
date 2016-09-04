@@ -5,6 +5,10 @@ defmodule Maze.Server do
   @columns 10
   ## Client API
 
+  defstruct rooms: [], room_positions: []
+
+
+
   @doc """
   Starts the maze.
   """
@@ -32,8 +36,9 @@ defmodule Maze.Server do
 
   def init(args) do
    IO.inspect(args)
-   initialize_maze(args[:rows], args[:columns])
-    {:ok, args}
+   {rooms, room_positions} = initialize_maze(args[:rows], args[:columns])
+   state = %Maze.Server{rooms: rooms, room_positions:  room_positions}
+    {:ok, state}
   end
 
 
@@ -44,8 +49,9 @@ defmodule Maze.Server do
     room_positions =
       for x <- (1..columns), y  <- (1..rows), do:  %Maze.Position{x: x, y: y}
     rooms = Enum.map(room_positions, fn(p) -> %Maze.Room{ position: p} end)
-    IO.inspect(room_positions)
-    IO.inspect(rooms)
+    # IO.inspect(room_positions)
+    # IO.inspect(rooms)
+    {rooms, room_positions}
   end
 
 
@@ -53,6 +59,13 @@ defmodule Maze.Server do
     Kernel.inspect(state, [])
     {:reply,state,  state}
   end
+
+  def handle_call( :rooms , _from, state) do
+    Kernel.inspect(state, [])
+    {:reply,state,  state}
+  end
+
+
 
   # def handle_cast({:create, name}, names) do
   #   if Map.has_key?(names, name) do
