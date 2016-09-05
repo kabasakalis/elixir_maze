@@ -1,37 +1,17 @@
 defmodule Maze.Server do
   use GenServer
 
-  @rows 10
-  @columns 10
-  @opposite_direction  [ left: :right, up: :down, right: :left, down: :up ]
-  @directions Keyword.keys( @opposite_direction)
-  @rows_min  1
-  @rows_max = 40
-  @columns_min = 1
-  @columns_max = 73
-  @canvas_sleep_max = 1.0
-
-  def directions, do: @directions
-  def opposite_direction, do: @opposite_direction
-  def rows, do: @rows
-  def columns, do: @columns
-  def rows_min, do: @rows_min
-  def rows_max, do: @rows_max
-  def columns_min, do: @columns_min
-  def columns_max, do: @columns_max
-  def canvas_sleep_max, do: @canvas_sleep_max
-
+  defstruct  mazes: []
 
   ## Client API
 
-  defstruct rooms: [], room_positions: []
 
 
 
   @doc """
   Starts the maze.
   """
-  def start_link(args \\ %{rows: @rows, columns: @columns})  do
+  def start_link(args \\ %Maze.Server{})  do
     GenServer.start_link(__MODULE__, args)
   end
 
@@ -55,34 +35,23 @@ defmodule Maze.Server do
 
       def init(args) do
         IO.inspect(args)
-        {rooms, room_positions} = initialize_maze(args[:rows], args[:columns])
-        state = %Maze.Server{rooms: rooms, room_positions:  room_positions}
+        # {rooms, room_positions} = initialize_maze(args[:rows], args[:columns])
+        state = args
         {:ok, state}
       end
 
 
-      defp initialize_maze(rows, columns) do
-
-        IO.inspect(rows)
-        IO.inspect(columns)
-        room_positions =
-          for x <- (1..columns), y  <- (1..rows), do:  %Maze.Position{x: x, y: y}
-          rooms = Enum.map(room_positions, fn(p) -> %Maze.Room{ position: p} end)
-          # IO.inspect(room_positions)
-          # IO.inspect(rooms)
-          {rooms, room_positions}
+      def handle_call({:init_maze, rows , columns ,  name } , _from, state) do
+        {:ok, maze } = Maze.initialize(name, rows, columns)
+        new_state =  %{ state | mazes: [maze |  state.mazes] }
+        {:reply, maze,  new_state}
       end
-
 
       def handle_call( :build , _from, state) do
         {:ok, built_rooms } = Maze.Builder.build_maze(state.rooms)
         {:reply, built_rooms,  state}
       end
 
-      def handle_call( :rooms , _from, state) do
-        IO.inspect(state.rooms, [])
-        {:reply,state.rooms, state}
-      end
 
 
       # def handle_cast({:create, name}, names) do
