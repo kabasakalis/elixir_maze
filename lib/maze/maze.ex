@@ -1,5 +1,9 @@
 defmodule Maze  do
 
+
+
+alias Maze.Position
+
   @rows 10
   @columns 10
   @opposite_direction  [ left: :right, up: :down, right: :left, down: :up ]
@@ -11,8 +15,8 @@ defmodule Maze  do
   @canvas_sleep_max  1.0
 
 
-      @path = [pos(rand(1..maze.columns), rand(1..maze.rows))]
-      @visited_positions = @path.dup
+      # @path = [pos(rand(1..maze.columns), rand(1..maze.rows))]
+      # @visited_positions = @path.dup
 
   def directions, do: @directions
   def opposite_direction, do: @opposite_direction
@@ -32,6 +36,9 @@ defmodule Maze  do
             path: [],
             visited_positions: []
 
+
+
+
   def initialize(name, rows, columns) do
     # IO.inspect(rows)
     # IO.inspect(columns)
@@ -48,11 +55,13 @@ defmodule Maze  do
 
   defp previous_position(maze), do: Enum.at(maze.visited_positions, -2)
 
-  defp go_back_to_previous_visited_room(maze), when: length(maze.visited_positions) >= 1   do
-    List.delete( maze.visited_positions, List.last(maze.visited_positions))
+  defp go_back_to_previous_visited_room(maze)  do
+    if (length(maze.visited_positions) >= 1) do
+      List.delete( maze.visited_positions, List.last(maze.visited_positions))
+    end
   end
 
-  defp next_position(direction, position)
+  defp next_position(maze, direction, position) do
    next_position = case direction do
        :left ->
          if (position.x - 1 >= 1 ), do: pos(position.x - 1, position.y ), else: nil
@@ -65,14 +74,43 @@ defmodule Maze  do
         _  ->
          nil
    end
+  end
 
-  defp room(maze, position)
-    Enum.find(maze.rooms, fun(r)-> r.position == position end)
+  defp room(maze, position) do
+    Enum.find(maze.rooms, fn(r) -> r.position == position end)
     # maze.find_room position unless position.nil?
   end
 
-  defp current_room(maze)
+  defp current_room(maze) do
     room(maze, current_position(maze))
+  end
+
+
+#  DIRECTIONS.each do |direction|
+#       define_method "room_#{direction}" do
+#         room next_position(direction, current_position)
+#       end
+#     end
+#
+#     def determine_direction(next_room)
+#       DIRECTIONS.each do |direction|
+#         room = send "room_#{direction}"
+#         return direction if room && room.position == next_room.position
+#       end
+#     end
+
+  @directions |> Enum.map(&Kernel.to_string/1) |> Enum.each(fn direction ->
+    def unquote(:"room_#{direction}")(maze) do
+      room(maze, next_position(maze, unquote(String.to_atom(direction)), current_position(maze)))
+    end
+  end)
+
+  defp  determine_direction(maze, next_room) do
+   @directions |> Enum.each(fn direction ->
+       room=Code.eval_string("room_#{to_string(direction)})(maze)", [direction: direction, maze: maze])
+       # room = unquote("room_#{to_string(direction)}")(maze)
+      if (room && room.position == next_room.position), do: direction, else: nil
+   end)
   end
 
 
