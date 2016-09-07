@@ -48,7 +48,7 @@ defmodule Maze.Server do
       end
 
       def handle_call( :build , _from, state) do
-        {:ok, built_rooms } = Maze.Builder.build_maze(state.rooms)
+        {:ok, built_rooms } = Maze.build(state.maze)
         {:reply, built_rooms,  state}
       end
 
