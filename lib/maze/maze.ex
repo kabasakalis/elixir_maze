@@ -68,10 +68,9 @@ defmodule Maze  do
 
   defp go_back_to_previous_visited_room(maze)  do
     maze = if (length(maze.visited_positions) >= 1) do
-      updated_visited_positions = List.delete( maze.visited_positions, List.first(maze.visited_positions))
-      {_, maze }= Map.get_and_update(maze, :visited_positions , fn vp -> {vp, updated_visited_positions  } end )
+      Map.update(maze, :visited_positions ,nil,  fn vp -> vp |> List.delete(List.first(vp)) end)
     else
-     maze
+      nil
     end
   end
 
@@ -101,104 +100,77 @@ defmodule Maze  do
 
 
 
-  # @directions |> Enum.map(&Kernel.to_string/1) |> Enum.each(fn direction ->
-    #   def room_to(maze, unquote(direction)) do
-      #     room(maze, next_position(maze, unquote(String.to_atom(direction)), current_position(maze)))
-      #   end
-      # end)
 
-    def room_to(maze, direction) do
-      room(maze, next_position(maze, direction, current_position(maze)))
-    end
+  def room_to(maze, direction) do
+    room(maze, next_position(maze, direction, current_position(maze)))
+  end
 
 
 
 
-    defp  determine_direction(maze, next_room) do
-      @directions |> Enum.each(fn direction ->
-        room = room_to(maze, direction)
-        if (room && room.position == next_room.position), do: direction, else: nil
-      end)
-    end
+  defp  determine_direction(maze, next_room) do
+    @directions |> Enum.each(fn direction ->
+      room = room_to(maze, direction)
+      if (room && room.position == next_room.position), do: direction, else: nil
+    end)
+  end
 
 
-    # Look for surrounding rooms that have not been built yet.
-    def valid_rooms_to_build(maze) do
-      valid_rooms =  Enum.reduce(@directions, [], fn(direction, valid_rooms) ->
-        a_room = room_to(maze, direction)
-        if a_room && !Room.visited?(a_room) do
-          [a_room | valid_rooms]
-        else
-          valid_rooms
-        end
-      end)
-    if  previous_position(maze)  do
-      previous_room = room(maze, previous_position(maze))
-      List.delete(valid_rooms,previous_room)
-    else
-      valid_rooms
-    end
-    end
-
-
-    defp build_room(a_room, exit_to_free) do
-      {_,built_room }= Map.get_and_update(a_room, :available_exits , fn ae -> {ae, [exit_to_free|ae]} end )
-      {_,built_room }= Map.get_and_update( built_room, :visits_from , fn vm ->{vm, [exit_to_free|vm]} end )
-      built_room
-    end
-
-
-
-    # s def build_maze
-    #     self.class.log.info "Now building #{maze.rows * maze.columns} rooms for maze."
-    #     self.class.log.info 'Please Wait.'
-    #     until maze.all_rooms_visited?
-    #       if !valid_rooms_to_build.empty?
-    #         next_room = valid_rooms_to_build.sample
-    #         direction = determine_direction next_room
-    #         build_room current_room, direction
-    #         path << next_room.position
-    #         visited_positions << next_room.position
-    #         build_room next_room, OPPOSITE_DIRECTION[direction]
-    #       else
-      #         go_back_to_previous_visited_room
-      #         path << current_room.position
-      #       end
-      #     end
-      #     self.class.log.info "Builder Path:   #{path.map { |p| [p.x, p.y] }.inspect}"
-      #     self.class.log.info "Maze built  after #{path.size} steps"
-      #   end
-      # end
-      #
-      def build(maze) do
-        with  false  <- Room.all_rooms_visited?(maze.rooms) do
-          if Enum.empty?(valid_rooms_to_build(maze)) do
-             next_room = Enum.take_random( valid_rooms_to_build(maze), 1)
-             direction = determine_direction(maze, next_room )
-
-             current_room_built =  build_room( current_room(maze), direction)
-             current_room_index= Enum.find_index(maze.rooms, fn(r) -> r.position == current_room_built.position end)
-              {_, maze }= Map.get_and_update(maze, :rooms , fn rooms -> {rooms, List.replace_at(rooms, current_room_index,current_room_built)  } end )
-
-              {_, maze }= Map.get_and_update(maze, :build_path , fn bp -> {bp, [ next_room.position | bp ]} end )
-              {_, maze }= Map.get_and_update(maze, :visited_positions, fn vp -> {vp, [ next_room.position | vp ]} end )
-
-
-              next_room_built =  build_room( next_room ,@opposite_direction[ direction])
-              next_room_index = Enum.find_index( maze.rooms, fn(r) -> r.position == next_room_built.position end)
-               {_, maze }= Map.get_and_update(maze, :rooms , fn rooms -> {rooms, List.replace_at(rooms, next_room_index,current_room_built)  } end )
-
-          else
-            maze = go_back_to_previous_visited_room(maze)
-            {_, maze }= Map.get_and_update(maze, :build_path , fn bp -> {bp, [ current_room(maze).position | bp ]} end )
-          end
-          build(maze)
-        else
-          true ->
-            maze
-        end
-
+  # Look for surrounding rooms that have not been built yet.
+  def valid_rooms_to_build(maze) do
+    valid_rooms =  Enum.reduce(@directions, [], fn(direction, valid_rooms) ->
+      a_room = room_to(maze, direction)
+      if a_room && !Room.visited?(a_room) do
+        [a_room | valid_rooms]
+      else
+        valid_rooms
       end
+    end)
+  if  previous_position(maze)  do
+    previous_room = room(maze, previous_position(maze))
+    List.delete(valid_rooms,previous_room)
+  else
+    valid_rooms
+  end
+  end
+
+
+  defp build_room(room, exit_to_free) do
+    room
+    |>Map.update( :available_exits , nil, fn ae ->  [exit_to_free|ae]  end )
+    |>Map.update( :visits_from , nil, fn vm ->  [exit_to_free|vm] end )
+
+  end
+
+  defp update_maze_with_built_room(maze, room) do
+    room_index= Enum.find_index(maze.rooms, fn(r) -> r.position == room.position end)
+    Map.update(maze, :rooms, nil, fn rooms -> List.replace_at(rooms, room_index, room) end )
+  end
+
+def build(maze) do
+  with  false  <- Room.all_rooms_visited?(maze.rooms) do
+    if Enum.empty?(valid_rooms_to_build(maze)) do
+      next_room = Enum.take_random( valid_rooms_to_build(maze), 1)
+      direction = determine_direction(maze, next_room )
+      current_room_built =  build_room( current_room(maze), direction)
+      next_room_built =  build_room( next_room ,@opposite_direction[ direction])
+      maze
+      |> update_maze_with_built_room(current_room_built)
+      |> update_maze_with_built_room(next_room_built)
+      |> Map.update(maze, :build_path , fn bp ->  [ next_room.position | bp ] end )
+      |> Map.update(maze, :visited_positions , fn vp ->  [ next_room.position | vp ] end )
+    else
+      maze
+      |> go_back_to_previous_visited_room
+      |> Map.update(:build_path , nil,  fn bp ->  [ current_room(maze).position | bp ] end )
+    end
+    build(maze)
+  else
+    true ->
+      maze
+  end
+
+end
 
 
 end
