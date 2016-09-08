@@ -157,8 +157,8 @@ def build(maze) do
       maze
       |> update_maze_with_built_room(current_room_built)
       |> update_maze_with_built_room(next_room_built)
-      |> Map.update(maze, :build_path , fn bp ->  [ next_room.position | bp ] end )
-      |> Map.update(maze, :visited_positions , fn vp ->  [ next_room.position | vp ] end )
+      |> Map.update(:build_path , fn bp ->  [ next_room.position | bp ] end )
+      |> Map.update(:visited_positions , fn vp ->  [ next_room.position | vp ] end )
     else
       maze
       |> go_back_to_previous_visited_room
