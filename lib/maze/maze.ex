@@ -1,7 +1,5 @@
 defmodule Maze  do
 
-
-
   alias Maze.Position
   alias Maze.Room
 
@@ -99,13 +97,9 @@ defmodule Maze  do
   end
 
 
-
-
   def room_to(maze, direction) do
     room(maze, next_position(maze, direction, current_position(maze)))
   end
-
-
 
 
   defp  determine_direction(maze, next_room) do
@@ -174,9 +168,6 @@ defmodule Maze  do
 
 
 
-
-
-
   # The solver is assumed to be able to look through available exits and see if the goal is there.
   # (Sees only one step ahead)
   defp look_for_exit_leading_to_goal_in_next_room(maze) do
@@ -198,31 +189,6 @@ defmodule Maze  do
   defp reset_rooms_visits_from(maze) do
     Enum.each(maze.rooms, fn(r) ->Maze.update(r, :room_visits, [], []) end)
   end
-
-
-
-
-  #   def solve_maz
-  #   self.class.log.info 'Maze is now being solved,please wait.'
-  #   reset_rooms_visits_from
-  #   until current_position == goal_position
-  #         if use_smart_strategy_to_choose_next_forward_move
-  #         next_direction = use_smart_strategy_to_choose_next_forward_move
-  #         next_room = send "room_#{next_direction}"
-  #         current_room.used_exits << next_direction
-  #         path << next_room.position
-  #         visited_positions << next_room.position
-  #         next_room.visits_from << OPPOSITE_DIRECTION[next_direction]
-  #   else # go back
-  #       go_back_to_previous_visited_room
-  #       path << current_room.position
-  #   end
-  #     end
-  #
-  #     self.class.log.info "Solver Path:   #{path.map { |p| [p.x, p.y] }.inspect}"
-  #     self.class.log.info "Maze Solved after #{path.size} steps"
-  #   end
-  # end
 
 
   def solve(maze) do
@@ -254,8 +220,6 @@ defmodule Maze  do
     end
 
   end
-
-
 
 
 end
