@@ -38,7 +38,7 @@ defmodule Maze  do
   build_path: [],
   solve_path: [],
   visited_positions: [],
-  goal_position: %Position{x: @columns, y: @rows)
+  goal_position: %Position{x: @columns, y: @rows}
 
 
   defp pos(x, y), do: %Position{x: x, y: y}
@@ -157,8 +157,8 @@ defmodule Maze  do
         maze
         |> update_maze_with_built_room(current_room_built)
         |> update_maze_with_built_room(next_room_built)
-        |> Map.update(:build_path , fn bp ->  [ next_room.position | bp ] end )
-        |> Map.update(:visited_positions , fn vp ->  [ next_room.position | vp ] end )
+        |> Map.update(:build_path, nil, fn bp ->  [ next_room.position | bp ] end )
+        |> Map.update(:visited_positions, nil, fn vp ->  [ next_room.position | vp ] end )
       else
         maze
         |> go_back_to_previous_visited_room
@@ -192,71 +192,62 @@ defmodule Maze  do
     look_for_exit_leading_to_goal_in_next_room(maze) ||
     Enum.find(Room.less_used_available_exits(current_room(maze)), fn exit ->
       exit != List.last(current_room(maze).visits_from)
+    end)
+  end
 
-
-  defp reset_rooms_visits_from(maze), do
+  defp reset_rooms_visits_from(maze) do
     Enum.each(maze.rooms, fn(r) ->Maze.update(r, :room_visits, [], []) end)
   end
 
 
 
 
-    def solve_maze
-    self.class.log.info 'Maze is now being solved,please wait.'
-    reset_rooms_visits_from
-    until current_position == goal_position
-          if use_smart_strategy_to_choose_next_forward_move
-          next_direction = use_smart_strategy_to_choose_next_forward_move
-          next_room = send "room_#{next_direction}"
-          current_room.used_exits << next_direction
-          path << next_room.position
-          visited_positions << next_room.position
-          next_room.visits_from << OPPOSITE_DIRECTION[next_direction]
-    else # go back
-        go_back_to_previous_visited_room
-        path << current_room.position
-    end
-      end
-
-      self.class.log.info "Solver Path:   #{path.map { |p| [p.x, p.y] }.inspect}"
-      self.class.log.info "Maze Solved after #{path.size} steps"
-    end
-  end
-
-
-
+  #   def solve_maz
+  #   self.class.log.info 'Maze is now being solved,please wait.'
+  #   reset_rooms_visits_from
+  #   until current_position == goal_position
+  #         if use_smart_strategy_to_choose_next_forward_move
+  #         next_direction = use_smart_strategy_to_choose_next_forward_move
+  #         next_room = send "room_#{next_direction}"
+  #         current_room.used_exits << next_direction
+  #         path << next_room.position
+  #         visited_positions << next_room.position
+  #         next_room.visits_from << OPPOSITE_DIRECTION[next_direction]
+  #   else # go back
+  #       go_back_to_previous_visited_room
+  #       path << current_room.position
+  #   end
+  #     end
+  #
+  #     self.class.log.info "Solver Path:   #{path.map { |p| [p.x, p.y] }.inspect}"
+  #     self.class.log.info "Maze Solved after #{path.size} steps"
+  #   end
+  # end
 
 
   def solve(maze) do
-    reset_rooms_visits_from(maze)
+    # reset_rooms_visits_from(maze)
     with  false  <- current_room(maze).position == maze.goal_position do
-      if use_smart_strategy_to_choose_next_forward_move(maze) do
+      updated_maze = if use_smart_strategy_to_choose_next_forward_move(maze) do
         next_direction  = use_smart_strategy_to_choose_next_forward_move(maze)
+
         next_room = room_to(maze, next_direction)
-        Map.update(current_room(maze),:used_exits, fn ue ->  [ next_direction | ue ] end )
-
-       Map.update(maze,:solve_path , fn sp ->  [ next_room.position | sp ] end )
-       Map.update(maze,:visited_positions , fn vp  [ next_room.position |vp ] end )
-
-        Map.update(next_room(maze),:visits_from, fn vm ->
-          [ @opposite_direction[ next_direction] | vm ]]
-        end )
-
-
-        # direction = determine_direction(maze, next_room )
-        # current_room_built =  build_room( current_room(maze), direction)
-        # next_room_built =  build_room( next_room ,@opposite_direction[ direction])
-        # maze
-        # |> update_maze_with_built_room(current_room_built)
-        # |> update_maze_with_built_room(next_room_built)
-        # |> Map.update(:build_path , fn bp ->  [ next_room.position | bp ] end )
-        # |> Map.update(:visited_positions , fn vp ->  [ next_room.position | vp ] end )
+                  |>Map.update(:visits_from, nil, fn vm ->
+                  [ @opposite_direction[next_direction] | vm ]
+                  end )
+        current_room_built =
+          Map.update(current_room(maze), :used_exits, nil,fn ue ->  [ next_direction | ue ] end )
+       maze
+           |> update_maze_with_built_room(current_room_built)
+           |> update_maze_with_built_room(next_room)
+           |> Map.update(:solve_path, nil, fn sp ->  [ next_room.position | sp ] end )
+           |> Map.update(:visited_positions, nil, fn vp ->  [ next_room.position |vp ] end )
       else
         maze
         |> go_back_to_previous_visited_room
         |> Map.update(:solve_path , nil,  fn sp ->  [ current_room(maze).position | sp ] end )
       end
-      build(maze)
+      solve(updated_maze)
     else
       true ->
         maze
