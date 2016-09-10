@@ -2,10 +2,33 @@ defmodule Maze.Room do
 
   defstruct position: %Maze.Position{}, visits_from: [], available_exits: [], used_exits: []
 
+
+  @doc ~S"""
+    Parses the given `line` into a command.
+
+    ## Examples
+
+        iex> 1+1
+        2
+
+    """
+
   def find_room(rooms, x, y) do
    Enum.find(rooms, fn(room) ->
                     (room.position.x == x) && (room.position.y ==y ) end)
   end
+
+   @doc ~S"""
+    Parses the given `line` into a command.
+
+    ## Examples
+
+        iex> 1+1
+        2
+
+    """
+
+
 
   def find_room(rooms, position) do
    Enum.find(rooms, fn(room) -> room.position == position end)
@@ -15,6 +38,7 @@ defmodule Maze.Room do
   def visited?(room) do
     Enum.any? room.visits_from
   end
+
 
   def all_rooms_visited?(rooms)  do
     Enum.all?(rooms, fn(room) ->  visited?(room) end )

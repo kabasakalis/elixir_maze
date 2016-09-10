@@ -187,7 +187,7 @@ defmodule Maze  do
   end
 
   defp reset_rooms_visits_from(maze) do
-    Enum.each(maze.rooms, fn(r) ->Maze.update(r, :room_visits, [], []) end)
+    Enum.each(maze.rooms, fn(r) -> Map.update(r, :room_visits, [], []) end)
   end
 
 

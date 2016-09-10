@@ -1,5 +1,6 @@
+ExUnit.start
 defmodule ElixirMazeTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
   doctest ElixirMaze
 
   test "the truth" do

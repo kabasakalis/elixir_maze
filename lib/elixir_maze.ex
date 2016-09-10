@@ -3,6 +3,15 @@ defmodule ElixirMaze do
 
   # See http://elixir-lang.org/docs/stable/elixir/Application.html
   # for more information on OTP Applications
+ @doc ~S"""
+  Parses the given `line` into a command.
+
+  ## Examples
+
+      iex> 1+1
+      2
+
+  """
   def start(_type, _args) do
     import Supervisor.Spec, warn: false
 

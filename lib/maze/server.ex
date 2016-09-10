@@ -41,8 +41,8 @@ defmodule Maze.Server do
       end
 
 
-      def handle_call({:init_maze, rows , columns ,  name } , _from, state) do
-        {:ok, maze } = Maze.initialize(name, rows, columns)
+      def handle_call({:init_maze, rows , columns ,  name ,goal_position} , _from, state) do
+        {:ok, maze } = Maze.initialize(name, rows, columns, goal_position)
         new_state =  %{ state | mazes: [maze |  state.mazes] }
         {:reply, maze,  new_state}
       end
