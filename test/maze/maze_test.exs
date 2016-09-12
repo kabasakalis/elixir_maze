@@ -57,26 +57,38 @@ defmodule MazeTest do
     assert Enum.count(maze.build_path) == 0 && is_list(default_maze.build_path)
     assert Enum.count(maze.solve_path) == 0 && is_list(default_maze.solve_path)
     assert Enum.count(maze.visited_positions) == 0 && is_list(default_maze.visited_positions)
-    # IO.puts "#{inspect(default_maze)}"
   end
 
 
-test "Sets start and goal positions." ,  context do
-{:ok, maze} = Maze.initialize()
-maze = Maze.set_goal_and_start maze
-    IO.puts "START #{inspect(maze.start_position)}\n"
-    IO.puts "aGOAL   #{inspect(maze.goal_position)}\n"
+  test "Sets start and goal positions." ,  context do
+    # Default goal_position
+    {:ok, default_maze2} = Maze.initialize()
+    default_maze2 = Maze.set_goal_and_start default_maze2
+    assert default_maze2.goal_position == %Position{x: 10, y: 10}
+
+    #Set start_position and goal_position
+    {:ok, maze2} = Maze.initialize()
+    maze2 = Maze.set_goal_and_start maze2, [3,4], [9, 9]
+    assert maze2.goal_position == %Position{x: 3, y: 4}
+    assert maze2.start_position == %Position{x: 9, y: 9}
+
   end
 
 
 
 
   test "Builds a maze." ,  context do
-    assert 1 == 1
+    {:ok, maze} = Maze.initialize()
+    maze = Maze.set_goal_and_start maze, [7,8], [2, 3]
     # IO.puts "#{inspect(context)}"
+    # IO.puts "#{inspect(default_maze)}"
+    built_maze = Maze.build maze
+    IO.puts "#{inspect(built_maze)}\n"
+    IO.puts "#{inspect(maze.goal_position)}\n"
+    IO.puts "#{inspect(maze.start_position)}\n"
   end
 
-test "Solves a maze." ,  context do
+  test "Solves a maze." ,  context do
     assert 1 == 1
     # IO.puts "#{inspect(context)}"
   end
