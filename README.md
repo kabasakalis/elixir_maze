@@ -1,6 +1,6 @@
 # ElixirMaze
 
-Overambitious Elixir Port of my ruby-maze project.At least I'll try!
+### Elixir Port of my ruby-maze project
 
 ## Installation
 

@@ -3,7 +3,7 @@ defmodule Maze  do
   alias Maze.Position
   alias Maze.Room
 require IEx
-
+require Logger
   @rows 10
   @columns 10
   @opposite_direction  [ left: :right, up: :down, right: :left, down: :up ]
@@ -32,7 +32,6 @@ require IEx
   rows: @rows,
   columns: @columns,
   rooms: [],
-  room_positions: [],
   build_path: [],
   solve_path: [],
   visited_positions: [],
@@ -51,18 +50,17 @@ require IEx
      room_positions =
        for x <- (1..columns), y  <- (1..rows), do:  %Maze.Position{x: x, y: y}
        rooms = Enum.map(room_positions, fn(p) -> %Maze.Room{ position: p} end)
-       maze = %Maze{name: name,
-
+       maze = %Maze{
+        name: name,
         rows: rows,
         columns: columns,
-        rooms: rooms,
-        room_positions: room_positions }
+        rooms: rooms}
       # build_path: [start_position],
       # solve_path: [start_position],
       # goal_position: pos(Enum.at(goal_position,0),Enum.at(goal_position,1)),
       # goal_position: pos(Enum.at(goal_position,0),Enum.at(goal_position,1)),
       # visited_positions: [start_position] }
-     {:ok, maze }
+      maze
   end
 
 
@@ -172,37 +170,33 @@ require IEx
 def build(maze) do
 
    with  false  <- Room.all_rooms_visited?(maze.rooms) do
-          # IO.puts "#{Enum.count(valid_rooms_to_build(maze))}\n"
-          IO.puts "#{inspect(maze.build_path)}\n"
-     if !Enum.empty?(valid_rooms_to_build(maze)) do
+    updated_maze = if !Enum.empty?(valid_rooms_to_build(maze)) do
        next_room = Enum.take_random( valid_rooms_to_build(maze), 1) |> List.first
-
-       IO.puts "NEXT ROOM: #{inspect(next_room.position)}\n"
        direction = determine_direction(maze, next_room )
-       IO.puts "#{inspect(direction)}\n"
        current_room_built =  build_room( current_room(maze), direction)
-
-       IO.puts "#{inspect(current_room_built)}\n"
        next_room_built =  build_room( next_room ,@opposite_direction[ direction])
-       IO.puts "#{inspect(!Enum.empty?(valid_rooms_to_build(maze)))}"
-       IO.puts "#{inspect(valid_rooms_to_build(maze))}\n"
-
        maze
-       |> update_maze_with_built_room(current_room_built)
+      |> update_maze_with_built_room(current_room_built)
       |> update_maze_with_built_room(next_room_built)
       |> Map.update(:build_path, nil, fn bp ->  [ next_room.position | bp ] end )
       |> Map.update(:visited_positions, nil, fn vp ->  [ next_room.position | vp ] end )
 
      else
-
-       maze
-       |> go_back_to_previous_visited_room
-      |> Map.update(:build_path , nil,  fn bp ->  [ current_room(maze).position | bp ] end )
+        maze
+          |> go_back_to_previous_visited_room
+          |> Map.update(:build_path , nil,  fn bp ->  [ current_room(maze).position | bp ] end )
      end
-     build(maze)
+     build(updated_maze)
    else
      true ->
+       # Logger.info "MAZE: #{inspect(maze)}\n"
+       # Logger.info "START POSITION: #{inspect(maze.start_position)}\n"
+       # Logger.info "GOAL POSITION: #{inspect(maze.goal_position)}\n"
+       # Logger.info "BUILD PATH: #{inspect(Enum.map(maze.build_path, fn p -> {p.x,p.y}end))}\n"
+       Logger.info "Maze built in  #{inspect(Enum.count(maze.build_path))} steps.\n"
+       Logger.info "REVERSED BUILD PATH: #{inspect(Enum.map(maze.build_path, fn p -> {p.x,p.y}end) |> Enum.reverse)}\n"
        maze
+
    end
 
 end
@@ -257,6 +251,9 @@ def solve(maze) do
     solve(updated_maze)
   else
     true ->
+       Logger.info "Maze solved in  #{inspect(Enum.count(maze.solve_path))} steps.\n"
+       Logger.info "REVERSED SOLVE PATH: #{inspect(Enum.map(maze.solve_path, fn p -> {p.x,p.y}end) |> Enum.reverse)}\n"
+      Logger.info "LAST ROOM: #{inspect(maze.solve_path |> List.first)}\n"
       maze
   end
 
