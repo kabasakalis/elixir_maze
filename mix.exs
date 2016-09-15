@@ -29,10 +29,12 @@ defmodule ElixirMaze.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
-
-      #  {:visualixir, git: "git@github.com:koudelka/visualixir.git"}
+    {:canvas, "~> 0.0.1"}
     ]
 
 
   end
 end
+
+
+

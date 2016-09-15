@@ -48,7 +48,7 @@ defmodule MazeTest do
   test "Builds a maze." ,  context do
     built_maze = Maze.initialize() |>  Maze.set_goal_and_start( [7,8], [2, 3]) |> Maze.build
     assert  Room.all_rooms_visited?(built_maze.rooms) == true
-    assert  Enum.count(built_maze.build_path) >= 1
+    assert  Enum.count(built_maze.build_path) > 1
   end
 
   test "Solves a maze." ,  context do

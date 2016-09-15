@@ -186,6 +186,7 @@ def build(maze) do
           |> go_back_to_previous_visited_room
           |> Map.update(:build_path , nil,  fn bp ->  [ current_room(maze).position | bp ] end )
      end
+
      build(updated_maze)
    else
      true ->
