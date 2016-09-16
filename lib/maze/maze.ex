@@ -54,6 +54,7 @@ require Logger
         name: name,
         rows: rows,
         columns: columns,
+        room_positions: room_positions,
         rooms: rooms}
       # build_path: [start_position],
       # solve_path: [start_position],

@@ -6,6 +6,7 @@ defmodule ElixirMaze do
   @height 1024
   @scale 4
 
+  def scale, do: @scale
 
   # See http://elixir-lang.org/docs/stable/elixir/Application.html
   # for more information on OTP Applications
@@ -36,22 +37,26 @@ defmodule ElixirMaze do
     ]
 
 
-
+built_maze = Maze.initialize() |>  Maze.set_goal_and_start( [7,8], [2, 3]) |> Maze.build
+build_path = built_maze.build_path |> List.reverse
 # Define workers and child supervisors to be supervised
     children =
       if Mix.env != :test do
         [
           # Starts a worker by calling: ElixirMaze.Worker.start_link(arg1, arg2, arg3)
           # worker(ElixirMaze.Worker, [arg1, arg2, arg3]),
-          supervisor(
-            Supervisor,
-            [ [worker(Turtles.Turtle, [ ], restart: :transient)],
-              [name: Turtles.TurtleSupervisor, strategy: :simple_one_for_one] ]
-          ),
-          worker(Turtles.World, [{@width, @height}, [name: Turtles.World]]),
+          # supervisor(
+          #   Supervisor,
+          #   [ [worker(Turtles.Turtle, [ ], restart: :transient)],
+          #     [name: Turtles.TurtleSupervisor, strategy: :simple_one_for_one] ]
+          # ),
+          worker(Maze.Canvas, [built_maze,{@width, @height}, [name: Maze.Canvas]]),
           worker(
             Maze.Clock,
+
             [
+              built_path,
+              0
               # Turtles.World,
               # {@width, @height},
               # turtle_starter,
