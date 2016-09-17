@@ -37,7 +37,9 @@ build_path = built_maze.build_path |> Enum.reverse
         black: {0, 0, 0, 255},
         red: {150, 0, 0, 255},
         green: {0, 150, 0, 255},
-        blue: {0, 0, 150, 255}
+        blue: {0, 0, 150, 255},
+        cyan: {0, 251, 255, 255}
+
       }
     ]
 
