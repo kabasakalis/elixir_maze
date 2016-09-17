@@ -1,7 +1,7 @@
 defmodule Maze  do
 
-  alias Maze.Position
-  alias Maze.Room
+  alias Maze.{Position, Room, Painter}
+
 require IEx
 require Logger
   @rows 10

@@ -33,6 +33,25 @@ defmodule Maze.Server do
 
       ## Server Callbacks
 
+    def canvas_options(maze) do
+      [
+        width: maze.columns * Maze.Painter.room_size * Maze.Painter.scale,
+        height: maze.rows * Maze.Painter.room_size *Maze. Painter.scale,
+        paint_interval: 500,
+        painter_module: Maze.Painter,
+        painter_state: %{maze: maze},
+        brushes: %{
+          black: {0, 0, 0, 255},
+          red: {150, 0, 0, 255},
+          green: {0, 150, 0, 255},
+          blue: {0, 0, 150, 255},
+          cyan: {0, 251, 255, 255},
+          yellow: {255, 255, 0, 255}
+        }
+      ]
+    end
+
+
       def init(args) do
         IO.inspect(args)
         # {rooms, room_positions} = initialize_maze(args[:rows], args[:columns])
@@ -41,8 +60,26 @@ defmodule Maze.Server do
       end
 
 
-      def handle_call({:init_maze, rows , columns ,  name ,goal_position} , _from, state) do
-        {:ok, maze } = Maze.initialize(name, rows, columns, goal_position)
+      def handle_call(
+                       {
+                       :init_maze,
+                       rows,
+                       columns,
+                       name,
+                       goal_position,
+                       start_position
+                       },
+                       _from,
+                       state
+                       ) do
+        maze =
+           Maze.initialize( rows, columns, name)
+        |> Maze.set_goal_and_start( goal_position, start_position)
+        |> Maze.build
+        |> Maze.solve
+
+        Canvas.GUI.start_link(canvas_options(maze))
+
         new_state =  %{ state | mazes: [maze |  state.mazes] }
         {:reply, maze,  new_state}
       end

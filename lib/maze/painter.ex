@@ -4,29 +4,30 @@ defmodule Maze.Painter do
 
       @wall_thickness  2
       @room_size 25
-      @room_color  {0, 0, 0, 255}
-      @wall_color  {0, 251, 255, 255} #cyan
-      @builder_color  {0, 0, 0, 255} #black
       @current_room_pointer_color  {255, 255, 0, 255} #yellow
       @current_room_pointer_size  6
       @scale 3
+
+
+  def room_size, do: @room_size
+  def scale,  do: @scale
+
+
 
   def to_canvas_coordinate(coord) do
     (coord - 1) * @room_size
   end
 
   def to_canvas_coordinates({x, y}) do
-  {(x - 1) * @room_size, (y - 1) * @room_size}
+   {(x - 1) * @room_size, (y - 1) * @room_size}
   end
 
   def to_scale({x, y}) do
-
-  {x * @scale, y * @scale }
+    {x * @scale, y * @scale }
   end
 
   def to_scale(x) do
-
-  x * @scale
+    x * @scale
   end
 
 
@@ -55,7 +56,7 @@ defmodule Maze.Painter do
       canvas,
       {x , y } |> to_scale,
       {@room_size, @room_size} |> to_scale,
-      :green
+      :black
     )
   end
 
@@ -105,9 +106,6 @@ def draw_wall(canvas, position = {x, y}, :down)  do
       :cyan
     )
   end
-
-
-
 
 
   defp draw_solver(canvas, scale, {x, y}) do
