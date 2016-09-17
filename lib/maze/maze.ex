@@ -32,6 +32,7 @@ require Logger
   rows: @rows,
   columns: @columns,
   rooms: [],
+  room_positions: [],
   build_path: [],
   solve_path: [],
   visited_positions: [],

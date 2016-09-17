@@ -5,9 +5,8 @@ defmodule Maze.Clock do
 
   alias Maze.{Position, Room}
 
-  defstruct
-  build_path: nil,
-  current_index: 0
+ defstruct  build_path: nil, current_index: 0
+
 
   # Client API
 
@@ -28,7 +27,7 @@ defmodule Maze.Clock do
       current_index: 0
     }
   ) do
-  {:ok, new_clock}
+  {:ok, clock}
   end
 
   def handle_call(
@@ -39,20 +38,14 @@ defmodule Maze.Clock do
       current_index: current_index
     }
 
-  ) when current_index < (Enum.count(build_path) - 1)  do
-  {:reply, :ok, %__MODULE__{clock | current_index: current_index + 1}}
+  ) do
+
+new_clock = if current_index < (Enum.count(build_path) - 1), do:
+%__MODULE__{clock | current_index: current_index + 1}, else: nil
+
+  {:reply, :ok, new_clock }
   end
 
- def handle_call(
-    :tick,
-    _from,
-    clock = %__MODULE__{
-      build_path: build_path,
-      current_index: current_index
-    }
-  ) when current_index >= (Enum.count(build_path) - 1)  do
-  {:reply, :ok, nil }
-  end
 
   # def handle_info(
   #   {:DOWN, _reference, :process, pid, _reason},

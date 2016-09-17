@@ -22,12 +22,17 @@ defmodule ElixirMaze do
   def start(_type, _args) do
     import Supervisor.Spec, warn: false
 
+
+built_maze = Maze.initialize() |>  Maze.set_goal_and_start( [7,8], [2, 3]) |> Maze.build
+build_path = built_maze.build_path |> Enum.reverse
+
+
     canvas_options = [
       width: @width * @scale,
       height: @height * @scale,
       paint_interval: 500,
       painter_module: Maze.Painter,
-      painter_state: @scale,
+      painter_state: %{maze: built_maze, scale: @scale},
       brushes: %{
         black: {0, 0, 0, 255},
         red: {150, 0, 0, 255},
@@ -37,8 +42,6 @@ defmodule ElixirMaze do
     ]
 
 
-built_maze = Maze.initialize() |>  Maze.set_goal_and_start( [7,8], [2, 3]) |> Maze.build
-build_path = built_maze.build_path |> List.reverse
 # Define workers and child supervisors to be supervised
     children =
       if Mix.env != :test do
@@ -50,12 +53,12 @@ build_path = built_maze.build_path |> List.reverse
           #   [ [worker(Turtles.Turtle, [ ], restart: :transient)],
           #     [name: Turtles.TurtleSupervisor, strategy: :simple_one_for_one] ]
           # ),
-          worker(Maze.Canvas, [built_maze,{@width, @height}, [name: Maze.Canvas]]),
+          # worker(Maze.Canvas, [built_maze,{@width, @height}, [name: Maze.Canvas]]),
           worker(
             Maze.Clock,
 
             [
-              built_path,
+              build_path,
               0
               # Turtles.World,
               # {@width, @height},
