@@ -43,8 +43,8 @@ require Logger
       room_canvas_coords = to_canvas_coordinates({room.position.x, room.position.y})
       draw_room(canvas, room_canvas_coords, :black)
       draw_all_walls(canvas, room_canvas_coords)
-      draw_build_path(canvas, maze)
     end)
+  draw_build_path(canvas, maze)
   end
 
 
@@ -87,10 +87,11 @@ require Logger
 
 
   def draw_build_path(canvas, maze) do
+    # Logger.info "CURRENT POSITIONS: #{inspect(current_position)}\n"
+    # Logger.info "DRAW_BUILD_PATH RUN "
       build_path = maze.build_path |> Enum.reverse
-      Enum.each(build_path, fn(current_position) ->
-
-     Logger.info "CURRENT POSITIONS: #{inspect(current_position)}\n"
+      # Enum.each(build_path, fn(current_position) ->
+          current_position = build_path |> List.first
       # :timer.sleep(200)
         current_room_index = Enum.find_index(maze.build_path, fn(p) ->
           p == current_position
@@ -99,15 +100,15 @@ require Logger
           current_room = Room.find_room(maze.rooms, current_position)
           room_canvas_coords = to_canvas_coordinates({current_room.position.x,
                                                       current_room.position.y})
-          draw_room(canvas, room_canvas_coords, :green)
+          draw_room(canvas, room_canvas_coords, :black)
           draw_walls(canvas, current_room)
           draw_position(canvas, current_room, :yellow)
 
           previous_position = Enum.at build_path, current_room_index - 1
           previous_room = Maze.room(maze, previous_position)
           if previous_room, do: draw_position(canvas, previous_room, :red)
-          # :timer.sleep(100)
-        end)
+          # :timer.sleep(1000)
+        # end)
     end
 
 

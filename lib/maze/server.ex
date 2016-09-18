@@ -37,7 +37,7 @@ defmodule Maze.Server do
       [
         width: maze.columns * Maze.Painter.room_size * Maze.Painter.scale,
         height: maze.rows * Maze.Painter.room_size *Maze. Painter.scale,
-        paint_interval: 500,
+        paint_interval: 1500,
         painter_module: Maze.Painter,
         painter_state: %{maze: maze},
         brushes: %{
