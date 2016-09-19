@@ -1,6 +1,6 @@
 defmodule Maze.Painter do
   alias Canvas.GUI.Brush
-  alias Maze.{Room, Position, Canvas}
+  alias Maze.{Room, Position, Canvas, Path}
 require Logger
   @room_size 26
   @scale 3
@@ -32,23 +32,45 @@ require Logger
 
 
   def paint(canvas, _width, _height,state) do
-    paint_maze(state[:maze],canvas)
-    # Clock.advance(Clock)
-     # :timer.sleep(200)
+
+    path_state = Path.get_path
+    # Logger.info( "REST PATH: #{inspect(Enum.count(path_state.path))}\n")
+    if Enum.count(state.maze.build_path) ==  Enum.count(path_state.path) do
+      paint_initialized_maze(state[:maze],canvas)
+    end
+    paint_build_path(state[:maze],canvas, path_state)
+     #
+    if (Enum.count(path_state.path) > 1), do: Path.move_to_next_position
   end
 
 
-  def paint_maze(maze,canvas) do
-    Enum.each(maze.rooms, fn room ->
+
+def paint_initialized_maze(maze, canvas) do
+   Enum.each(maze.rooms, fn room ->
       room_canvas_coords = to_canvas_coordinates({room.position.x, room.position.y})
       draw_room(canvas, room_canvas_coords, :black)
-      draw_all_walls(canvas, room_canvas_coords)
+      draw_all_walls(canvas, room_canvas_coords, :cyan)
     end)
-  draw_build_path(canvas, maze)
+end
+
+
+
+  def paint_build_path(maze, canvas, path_state) do
+    Logger.info( "GET PATH: #{inspect(Maze.Path.get_path())}\n")
+    # Logger.info "DRAW_BUILD_PATH RUN"
+    current_position = path_state.current_position
+    current_position = path_state.current_position
+    current_room = Room.find_room(maze.rooms, path_state.current_position)
+    room_canvas_coords = to_canvas_coordinates({current_room.position.x,
+      current_room.position.y})
+    # draw_room(canvas, room_canvas_coords, :black)
+    draw_walls(canvas, current_room, :black)
+    draw_position(canvas, current_room, :yellow)
+
+  previous_room = Maze.room(maze,path_state.previous_position)
+  if previous_room, do: draw_position(canvas, previous_room, :black)
+
   end
-
-
-
 
 
 
@@ -64,54 +86,6 @@ require Logger
       color
       )
     end
-
-#   def draw_builder_path
-#   visited_positions = []
-#   update do
-#     previous_position = visited_positions.last
-#     visited_positions << position = builder.path.shift
-#     if position
-#     room = maze.find_room(position)
-#     draw_room(room, ROOM_SIZE, BUILDER_COLOR)
-#     draw_walls(room, WALL_COLOR)
-#     draw_position room
-#     previous_room = maze.find_room(previous_position)
-#     draw_position(previous_room,
-#      CURRENT_ROOM_POINTER_SIZE,
-#      BUILDER_COLOR) if previous_room
-#   end
-#   ::Kernel.sleep(@sleep || 0.0)
-# end
-#     end
-
-
-
-  def draw_build_path(canvas, maze) do
-    # Logger.info "CURRENT POSITIONS: #{inspect(current_position)}\n"
-    # Logger.info "DRAW_BUILD_PATH RUN "
-      build_path = maze.build_path |> Enum.reverse
-      # Enum.each(build_path, fn(current_position) ->
-          current_position = build_path |> List.first
-      # :timer.sleep(200)
-        current_room_index = Enum.find_index(maze.build_path, fn(p) ->
-          p == current_position
-          end)
-        # if current_position
-          current_room = Room.find_room(maze.rooms, current_position)
-          room_canvas_coords = to_canvas_coordinates({current_room.position.x,
-                                                      current_room.position.y})
-          draw_room(canvas, room_canvas_coords, :black)
-          draw_walls(canvas, current_room)
-          draw_position(canvas, current_room, :yellow)
-
-          previous_position = Enum.at build_path, current_room_index - 1
-          previous_room = Maze.room(maze, previous_position)
-          if previous_room, do: draw_position(canvas, previous_room, :red)
-          # :timer.sleep(1000)
-        # end)
-    end
-
-
 
 
 defp clear(canvas, scale, {x, y}) do
@@ -129,64 +103,95 @@ defp draw_room(canvas, {x, y}, color) do
 end
 
 
-defp draw_all_walls(canvas, {x, y}) do
+defp draw_all_walls(canvas, {x, y}, color) do
   Enum.each(Maze.directions, fn side ->
-    draw_wall(canvas, {x, y}, side)
+    draw_wall(canvas, {x, y}, side, color)
   end)
 end
 
-defp draw_walls(canvas, room) do
+defp draw_walls(canvas, room, color) do
   Enum.each(Maze.directions, fn side ->
     canvas_coords = {room.position.x, room.position.y} |> to_canvas_coordinates
-    if Enum.member?(room.available_exits, side), do: draw_wall(canvas, canvas_coords, side)
+    if Enum.member?(room.available_exits, side), do: clear_wall(canvas, canvas_coords, side, color)
       end)
 end
 
 
-# def draw_walls(room, color)
-#       DIRECTIONS.each do |side|
-#         unless room.available_exits.include?(side.to_sym)
-#           send :draw_wall, room, side, color
-#         end
-#       end
-#     end
+def clear_wall(canvas, position = {x, y}, :left, color)  do
+  Brush.draw_rectangle(
+    canvas,
+    { x, y + @wall_thickness}  |> to_scale,
+    {@wall_thickness, @room_size - (2 * @wall_thickness)} |> to_scale,
+    color
+  )
+end
 
-def draw_wall(canvas, position = {x, y}, :left)  do
+def clear_wall(canvas, position = {x, y}, :right, color)  do
+  Brush.draw_rectangle(
+    canvas,
+    { (x + @room_size -  @wall_thickness ), y + @wall_thickness} |> to_scale,
+    {@wall_thickness, @room_size - (2 * @wall_thickness)} |> to_scale,
+    color
+  )
+end
+
+def clear_wall(canvas, position = {x, y}, :up, color)  do
+  Brush.draw_rectangle(
+    canvas,
+    { x + @wall_thickness, y} |> to_scale,
+    { @room_size - ( 2 *@wall_thickness), @wall_thickness} |> to_scale,
+    color
+  )
+end
+
+
+def clear_wall(canvas, position = {x, y}, :down, color)  do
+  Brush.draw_rectangle(
+    canvas,
+    {x + @wall_thickness, y + @room_size - @wall_thickness} |> to_scale,
+    { @room_size - ( 2 *@wall_thickness), @wall_thickness} |> to_scale,
+    color
+  )
+end
+
+
+
+def draw_wall(canvas, position = {x, y}, :left, color)  do
   Brush.draw_rectangle(
     canvas,
     position |> to_scale,
     {@wall_thickness, @room_size} |> to_scale,
-    :cyan
+    color
   )
 end
 
-def draw_wall(canvas, position = {x, y}, :right)  do
+def draw_wall(canvas, position = {x, y}, :right, color)  do
   Brush.draw_rectangle(
     canvas,
     { (x + @room_size -  @wall_thickness ), y} |> to_scale,
     {@wall_thickness, @room_size} |> to_scale,
-    :cyan
+    color
   )
 end
 
 
-def draw_wall(canvas, position = {x, y}, :up)  do
+def draw_wall(canvas, position = {x, y}, :up, color)  do
   Brush.draw_rectangle(
     canvas,
     position |> to_scale,
     { @room_size, @wall_thickness} |> to_scale,
-    :cyan
+    color
   )
 end
 
 
 
-def draw_wall(canvas, position = {x, y}, :down)  do
+def draw_wall(canvas, position = {x, y}, :down, color)  do
   Brush.draw_rectangle(
     canvas,
     {x, y + @room_size - @wall_thickness} |> to_scale,
     {@room_size,  @wall_thickness} |> to_scale,
-    :cyan
+    color
   )
 end
 

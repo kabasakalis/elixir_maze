@@ -1,6 +1,6 @@
 defmodule Maze.Server do
   use GenServer
-
+alias Maze.Path
   defstruct  mazes: []
 
   ## Client API
@@ -37,7 +37,7 @@ defmodule Maze.Server do
       [
         width: maze.columns * Maze.Painter.room_size * Maze.Painter.scale,
         height: maze.rows * Maze.Painter.room_size *Maze. Painter.scale,
-        paint_interval: 1500,
+        paint_interval: 100,
         painter_module: Maze.Painter,
         painter_state: %{maze: maze},
         brushes: %{
@@ -78,6 +78,9 @@ defmodule Maze.Server do
         |> Maze.build
         |> Maze.solve
 
+
+
+        Path.start_link(maze)
         Canvas.GUI.start_link(canvas_options(maze))
 
         new_state =  %{ state | mazes: [maze |  state.mazes] }
