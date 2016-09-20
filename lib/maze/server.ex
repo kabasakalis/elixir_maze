@@ -2,7 +2,7 @@ defmodule Maze.Server do
   use GenServer
 alias Maze.Path
   defstruct  mazes: []
-
+require Logger
   ## Client API
 
 
@@ -77,7 +77,11 @@ alias Maze.Path
            Maze.initialize( rows, columns, name )
         |> Maze.set_goal_and_start( goal_position, start_position)
         |> Maze.build
+        |> Maze.reset_rooms_visits_from
+        |> Map.update(:visited_positions, nil, fn vp ->  [ Maze.pos(Enum.at(start_position,0),Enum.at(start_position,1))] end )
+# Logger.info "MAZ e solve_path #{inspect(maze.solve_path)}"
         |> Maze.solve
+        # Logger.info "MAZ e visited_positions #{inspect(maze.visited_positions)}"
 
         {:ok, build_path_state_pid} = Path.start_link(maze, :build)
         {:ok, solve_path_state_pid} = Path.start_link(maze, :solve)

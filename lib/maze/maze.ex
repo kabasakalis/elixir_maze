@@ -67,6 +67,7 @@ require Logger
       }
       # build_path: [start_position],
       # solve_path: [start_position],
+      #
       # goal_position: pos(Enum.at(goal_position,0),Enum.at(goal_position,1)),
       # goal_position: pos(Enum.at(goal_position,0),Enum.at(goal_position,1)),
       # visited_positions: [start_position] }
@@ -171,6 +172,7 @@ require Logger
       |> Map.update(:start_position, nil, fn sp ->  start_position end )
       |> Map.update(:goal_position, nil, fn gp ->  goal_position end )
       |> Map.update(:build_path, nil, fn bp ->  [ start_position | bp ] end )
+      |> Map.update(:solve_path, nil, fn bp ->  [ start_position | bp ] end )
       |> Map.update(:visited_positions, nil, fn vp ->  [ start_position | vp ] end )
 
      end
@@ -232,7 +234,14 @@ def use_smart_strategy_to_choose_next_forward_move(maze) do
 end
 
 def reset_rooms_visits_from(maze) do
-  Enum.each(maze.rooms, fn(r) -> Map.update(r, :room_visits, [], []) end)
+  Enum.each(maze.rooms, fn(r) ->
+
+  updated_room =  Map.update(r, :room_visits, [], [])
+  update_maze_with_built_room(maze, updated_room)
+
+
+  end)
+maze
 end
 
 
@@ -258,6 +267,10 @@ def solve(maze) do
       |> go_back_to_previous_visited_room
       |> Map.update(:solve_path , nil,  fn sp ->  [ current_room(maze).position | sp ] end )
     end
+
+       # Logger.info "Mazas  visited_positions in  #{inspect(maze.visited_positions)} steps.\n"
+       # Logger.info "Mazas  solve_path_positions in  #{inspect(maze.solve_path)} steps.\n"
+       # Logger.info "Mazas  current_room in  #{inspect(current_room(maze).position)} steps.\n"
     solve(updated_maze)
   else
     true ->

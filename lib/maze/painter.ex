@@ -3,7 +3,7 @@ defmodule Maze.Painter do
   alias Maze.{Room, Position, Canvas, Path}
 require Logger
   @room_size 26
-  @scale 3
+  @scale 1
   @wall_thickness  2
   @current_room_pointer_size  10
   @current_room_color :red
@@ -63,13 +63,13 @@ require Logger
     # Logger.info "solve_path_state #{inspect(solve_path_state)}"
       if Enum.count(state.maze.solve_path) ==  Enum.count(solve_path_state.path) do
        Logger.info "DSFAD"
-        paint_initialized_maze(state[:maze],canvas, :raw)
-        # paint_initialized_maze(state[:maze],canvas, :built)
+        # paint_initialized_maze(state[:maze],canvas, :raw)
+        paint_initialized_maze(state[:maze],canvas, :built)
       end
 
-      # paint_solve_path(state[:maze], canvas, solve_path_state)
-      # if (solve_path_state.current_position  != state[:maze].goal_position ), do:
-      # Path.move_to_next_position(solve_path_state_pid)
+      paint_solve_path(state[:maze], canvas, solve_path_state)
+      if (solve_path_state.current_position  != state[:maze].goal_position ), do:
+      Path.move_to_next_position(solve_path_state_pid)
     end
 
 
@@ -85,7 +85,7 @@ require Logger
 
      # Logger.info "MODE  #{inspect(mode)}"
         if (mode == :raw),  do: paint_all_walls(canvas, room_canvas_coords, :cyan),
-                          else: paint_walls(canvas, room, :black)
+                          else: paint_walls2(canvas, room, :cyan)
          end)
   end
 
@@ -205,6 +205,12 @@ defp paint_walls(canvas, room, color) do
       end)
 end
 
+defp paint_walls2(canvas, room, color) do
+  Enum.each(Maze.directions, fn side ->
+    canvas_coords = {room.position.x, room.position.y} |> to_canvas_coordinates
+    if !Enum.member?(room.available_exits, side), do: paint_wall(canvas, canvas_coords, side, color, :full)
+      end)
+end
 
 
 def paint_wall(canvas, position = {x, y}, :left, color, length)  do
