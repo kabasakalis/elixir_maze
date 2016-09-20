@@ -1,6 +1,6 @@
 defmodule Maze  do
 
-  alias Maze.{Position, Room, Painter}
+  alias Maze.{Position, Room, Painter, Path}
 
 require IEx
 require Logger
@@ -35,6 +35,8 @@ require Logger
   room_positions: [],
   build_path: [],
   solve_path: [],
+  build_path_state_pid: nil,
+  solve_path_state_pid: nil,
   visited_positions: [],
   goal_position: [],
   start_position: []
@@ -45,7 +47,10 @@ require Logger
   def previous_position(maze), do: Enum.at(maze.visited_positions, 1 )
 
 
-  def initialize(rows \\ @rows , columns \\ @columns, name \\ "maze_#{rows}x#{columns}") do
+  def initialize(rows \\ @rows ,
+                 columns \\ @columns,
+                 name \\ "maze_#{rows}x#{columns}"
+               ) do
     start_position = pos( Enum.take_random(1..columns,1) |> List.first,
       Enum.take_random(1..rows,1) |> List.first  )
      room_positions =
@@ -56,7 +61,10 @@ require Logger
         rows: rows,
         columns: columns,
         room_positions: room_positions,
-        rooms: rooms}
+        rooms: rooms
+        # build_path_state: build_path_state,
+        # solve_path_state: build_path_state
+      }
       # build_path: [start_position],
       # solve_path: [start_position],
       # goal_position: pos(Enum.at(goal_position,0),Enum.at(goal_position,1)),
@@ -97,7 +105,6 @@ require Logger
   def current_room(maze) do
     room(maze, current_position(maze))
   end
-
 
   def room_to(maze, direction) do
     room(maze, next_position(maze, direction, current_position(maze)))

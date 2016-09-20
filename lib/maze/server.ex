@@ -33,13 +33,13 @@ alias Maze.Path
 
       ## Server Callbacks
 
-    def canvas_options(maze) do
+    def canvas_options(maze, paint_mode) do
       [
         width: maze.columns * Maze.Painter.room_size * Maze.Painter.scale,
         height: maze.rows * Maze.Painter.room_size *Maze. Painter.scale,
         paint_interval: 100,
         painter_module: Maze.Painter,
-        painter_state: %{maze: maze},
+        painter_state: %{maze: maze, paint_mode: paint_mode},
         brushes: %{
           black: {0, 0, 0, 255},
           red: {150, 0, 0, 255},
@@ -62,26 +62,30 @@ alias Maze.Path
 
       def handle_call(
                        {
-                       :init_maze,
+                       :init,
                        rows,
                        columns,
                        name,
                        goal_position,
-                       start_position
+                       start_position,
+                       paint_mode
                        },
                        _from,
                        state
                        ) do
         maze =
-           Maze.initialize( rows, columns, name)
+           Maze.initialize( rows, columns, name )
         |> Maze.set_goal_and_start( goal_position, start_position)
         |> Maze.build
         |> Maze.solve
 
+        {:ok, build_path_state_pid} = Path.start_link(maze, :build)
+        {:ok, solve_path_state_pid} = Path.start_link(maze, :solve)
+
+       maze = %Maze{ maze | build_path_state_pid: build_path_state_pid,  solve_path_state_pid: solve_path_state_pid }
 
 
-        Path.start_link(maze)
-        Canvas.GUI.start_link(canvas_options(maze))
+        Canvas.GUI.start_link(canvas_options(maze, paint_mode))
 
         new_state =  %{ state | mazes: [maze |  state.mazes] }
         {:reply, maze,  new_state}

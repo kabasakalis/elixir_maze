@@ -31,66 +31,135 @@ require Logger
   end
 
 
-  def paint(canvas, _width, _height,state) do
+  def paint(canvas, _width, _height, state) do
 
-    path_state = Path.get_path
-    # Logger.info( "REST PATH: #{inspect(Enum.count(path_state.path))}\n")
-    if Enum.count(state.maze.build_path) ==  Enum.count(path_state.path) do
-      paint_initialized_maze(state[:maze],canvas)
+
+
+
+    # Logger.info( "REST PATH: #{inspect(Enum.count(build_path_state.path))}\n")
+        #Build Maze
+    if state.paint_mode == :build  do
+
+      build_path_state_pid = state.maze.build_path_state_pid
+      build_path_state = Path.get_path( build_path_state_pid )
+
+
+      # Initialize raw  maze grid
+      if Enum.count(state.maze.build_path) ==  Enum.count(build_path_state.path) do
+        paint_initialized_maze(state[:maze],canvas, :raw)
+      end
+
+      paint_build_path(state[:maze],canvas, build_path_state)
+      if (Enum.count(build_path_state.path) > 1), do:
+      Path.move_to_next_position(build_path_state_pid)
     end
-    # paint_build_path(state[:maze],canvas, path_state)
-     #
-    # if (Enum.count(path_state.path) > 1), do: Path.move_to_next_position
+
+    if state.paint_mode == :solve  do
+
+      solve_path_state_pid = state.maze.solve_path_state_pid
+      solve_path_state = Path.get_path( solve_path_state_pid )
+
+    # Logger.info "solve_path_state #{inspect(solve_path_state)}"
+    # Logger.info "solve_path_state #{inspect(solve_path_state)}"
+      if Enum.count(state.maze.solve_path) ==  Enum.count(solve_path_state.path) do
+       Logger.info "DSFAD"
+        paint_initialized_maze(state[:maze],canvas, :raw)
+        # paint_initialized_maze(state[:maze],canvas, :built)
+      end
+
+      # paint_solve_path(state[:maze], canvas, solve_path_state)
+      # if (solve_path_state.current_position  != state[:maze].goal_position ), do:
+      # Path.move_to_next_position(solve_path_state_pid)
+    end
+
+
+
   end
 
 
 
-def paint_initialized_maze(maze, canvas) do
-   Enum.each(maze.rooms, fn room ->
-      room_canvas_coords = to_canvas_coordinates({room.position.x, room.position.y})
-      draw_room(canvas, room_canvas_coords, :black)
-      paint_all_walls(canvas, room_canvas_coords, :cyan)
-      # paint_walls(canvas, room, :black)
-    end)
-end
+  def paint_initialized_maze(maze, canvas, mode) do
+     Enum.each(maze.rooms, fn room ->
+        room_canvas_coords = to_canvas_coordinates({room.position.x, room.position.y})
+        draw_room(canvas, room_canvas_coords, :black)
+
+     # Logger.info "MODE  #{inspect(mode)}"
+        if (mode == :raw),  do: paint_all_walls(canvas, room_canvas_coords, :cyan),
+                          else: paint_walls(canvas, room, :black)
+         end)
+  end
 
 
 
-  def paint_build_path(maze, canvas, path_state) do
-    Logger.info( "GET PATH: #{inspect(Maze.Path.get_path())}\n")
+  def paint_build_path(maze, canvas, build_path_state) do
+    # Logger.info( "GET PATH: #{inspect(Maze.Path.get_path())}\n")
     # Logger.info "DRAW_BUILD_PATH RUN"
-    current_position = path_state.current_position
-    current_position = path_state.current_position
-    current_room = Room.find_room(maze.rooms, path_state.current_position)
+    current_position = build_path_state.current_position
+    current_room = Room.find_room(maze.rooms, build_path_state.current_position)
     room_canvas_coords = to_canvas_coordinates({current_room.position.x,
       current_room.position.y})
     # draw_room(canvas, room_canvas_coords, :black)
     paint_walls(canvas, current_room, :black)
     draw_position(canvas, current_room, :yellow)
 
-  previous_room = Maze.room(maze,path_state.previous_position)
+  previous_room = Maze.room(maze,build_path_state.previous_position)
   if previous_room, do: draw_position(canvas, previous_room, :black)
 
   end
 
 
 
-def paint_solve_path(maze, canvas, path_state) do
+
+
+def paint_solve_path(maze, canvas, solve_path_state) do
   # s Logger.info( "GET PATH: #{inspect(Maze.Path.get_path())}\n")
   #   # Logger.info "DRAW_BUILD_PATH RUN"
-  #   current_position = path_state.current_position
-  #   current_position = path_state.current_position
-  #   current_room = Room.find_room(maze.rooms, path_state.current_position)
-  #   room_canvas_coords = to_canvas_coordinates({current_room.position.x,
-  #     current_room.position.y})
-  #   # draw_room(canvas, room_canvas_coords, :black)
-  #   paint_walls(canvas, current_room, :black)
-  #   draw_position(canvas, current_room, :yellow)
-  #
-  # previous_room = Maze.room(maze,path_state.previous_position)
-  # if previous_room, do: draw_position(canvas, previous_room, :black)
+    current_position = solve_path_state.current_position
+    current_room = Room.find_room(maze.rooms, solve_path_state.current_position)
+    start_room = Room.find_room(maze.rooms, maze.start_position)
+    goal_room = Room.find_room(maze.rooms, maze.goal_position)
+    room_canvas_coords = to_canvas_coordinates({current_room.position.x,
+      current_room.position.y})
+
+    draw_position(canvas, current_room, :yellow)
+    draw_position(canvas, start_room, :red)
+    draw_position(canvas, goal_room, :blue)
+
+
+  previous_room = Maze.room(maze,solve_path_state.previous_position)
+  if previous_room, do: draw_position(canvas, previous_room, :black)
 
   end
+
+
+
+
+
+#  def draw_solver_path
+#       visited_positions = []
+#       color_room(solver.starting_position, ROOM_SIZE, 'red')
+#       color_room(solver.goal_position, ROOM_SIZE, 'blue')
+#       update do
+#         previous_position = visited_positions.last
+#         visited_positions << position = solver.path.shift
+#         if position
+#           room = maze.find_room(position)
+#           draw_position room
+#           previous_room = maze.find_room(previous_position)
+#           draw_position(previous_room, CURRENT_ROOM_POINTER_SIZE, 'olive') if previous_room
+#         end
+#         ::Kernel.sleep(@sleep || 0.0)
+#       end
+#     end
+
+
+
+
+
+
+
+
+
 
 
 

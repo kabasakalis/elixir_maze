@@ -12,18 +12,21 @@ defmodule Maze.Path  do
       %__MODULE__{ }
     end
     # Client API
-    def start_link(maze) do
-      Agent.start_link(fn  -> init(maze) end, name: __MODULE__)
+    def start_link(maze, path_type) do
+      # Agent.start_link(fn  -> init(maze) end, name: __MODULE__)
+      Agent.start_link(fn  -> init(maze, path_type) end )
     end
 
-    def get_path do
+    def get_path(agent_pid) do
 
-      Agent.get(__MODULE__,fn state -> state end)
+      # Agent.get(__MODULE__,fn state -> state end)
+      Agent.get( agent_pid,fn state -> state end)
       # {:lala,:koko}
     end
 
-    def move_to_next_position do
-      Agent.get_and_update(__MODULE__, fn state ->
+    def move_to_next_position(agent_pid) do
+      # Agent.get_and_update(__MODULE__, fn state ->
+      Agent.get_and_update(agent_pid, fn state ->
         new_previous_position = List.first state.path
         new_previous_room = Room.find_room(state.maze.rooms, new_previous_position)
         rest_of_path =  List.delete( state.path, List.first state.path)
@@ -45,8 +48,9 @@ defmodule Maze.Path  do
     #
     # Server API
 
-    defp init(maze) do
-      path = maze.build_path |> Enum.reverse
+    defp init(maze, path_type) do
+      path = if path_type == :build, do:  maze.build_path |> Enum.reverse,
+                                     else: maze.solve_path |> Enum.reverse
       first_position = path  |> List.first
       first_room = Room.find_room(maze.rooms, first_position)
 
