@@ -18,10 +18,7 @@ defmodule Maze.Path  do
     end
 
     def get_path(agent_pid) do
-
-      # Agent.get(__MODULE__,fn state -> state end)
       Agent.get( agent_pid,fn state -> state end)
-      # {:lala,:koko}
     end
 
     def move_to_next_position(agent_pid) do

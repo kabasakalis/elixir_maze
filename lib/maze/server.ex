@@ -1,18 +1,16 @@
 defmodule Maze.Server do
   use GenServer
-alias Maze.Path
+alias Maze.{Path, Position}
   defstruct  mazes: []
 require Logger
   ## Client API
-
-
 
 
   @doc """
   Starts the maze.
   """
   def start_link(args \\ %Maze.Server{})  do
-    GenServer.start_link(__MODULE__, args)
+    GenServer.start_link(__MODULE__, args, timeout: :infinity)
   end
 
   # @doc """
@@ -37,7 +35,7 @@ require Logger
       [
         width: maze.columns * Maze.Painter.room_size * Maze.Painter.scale,
         height: maze.rows * Maze.Painter.room_size *Maze. Painter.scale,
-        paint_interval: 100,
+        paint_interval: 10,
         painter_module: Maze.Painter,
         painter_state: %{maze: maze, paint_mode: paint_mode},
         brushes: %{
@@ -78,37 +76,19 @@ require Logger
         |> Maze.set_goal_and_start( goal_position, start_position)
         |> Maze.build
         |> Maze.reset_rooms_visits_from
-        |> Map.update(:visited_positions, nil, fn vp ->  [ Maze.pos(Enum.at(start_position,0),Enum.at(start_position,1))] end )
-# Logger.info "MAZ e solve_path #{inspect(maze.solve_path)}"
+        |> Maze.reset_visited_positions(start_position)
         |> Maze.solve
-        # Logger.info "MAZ e visited_positions #{inspect(maze.visited_positions)}"
 
         {:ok, build_path_state_pid} = Path.start_link(maze, :build)
         {:ok, solve_path_state_pid} = Path.start_link(maze, :solve)
 
-       maze = %Maze{ maze | build_path_state_pid: build_path_state_pid,  solve_path_state_pid: solve_path_state_pid }
-
-
+        maze = %Maze{ maze | build_path_state_pid: build_path_state_pid,
+                            solve_path_state_pid: solve_path_state_pid }
         Canvas.GUI.start_link(canvas_options(maze, paint_mode))
 
         new_state =  %{ state | mazes: [maze |  state.mazes] }
         {:reply, maze,  new_state}
       end
 
-      def handle_call( :build , _from, state) do
-        {:ok, built_rooms } = Maze.build(state.maze)
-        {:reply, built_rooms,  state}
-      end
-
-
-
-      # def handle_cast({:create, name}, names) do
-        #   if Map.has_key?(names, name) do
-          #     {:noreply, names}
-          #   else
-            #     {:ok, bucket} = KV.Bucket.start_link
-            #     {:noreply, Map.put(names, name, bucket)}
-            #   end
-            # end
-end
+ end
 

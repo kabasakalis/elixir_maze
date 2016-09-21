@@ -62,16 +62,8 @@ require Logger
         columns: columns,
         room_positions: room_positions,
         rooms: rooms
-        # build_path_state: build_path_state,
-        # solve_path_state: build_path_state
       }
-      # build_path: [start_position],
-      # solve_path: [start_position],
-      #
-      # goal_position: pos(Enum.at(goal_position,0),Enum.at(goal_position,1)),
-      # goal_position: pos(Enum.at(goal_position,0),Enum.at(goal_position,1)),
-      # visited_positions: [start_position] }
-      maze
+       maze
   end
 
 
@@ -233,16 +225,19 @@ def use_smart_strategy_to_choose_next_forward_move(maze) do
   end)
 end
 
-def reset_rooms_visits_from(maze) do
-  Enum.each(maze.rooms, fn(r) ->
+  def reset_rooms_visits_from(maze) do
+    reset_rooms =  Enum.map(maze.rooms, fn(r) ->
+      %Room{ r |  visits_from: []}
+     end)
+    %Maze{maze | rooms: reset_rooms}
+  end
 
-  updated_room =  Map.update(r, :room_visits, [], [])
-  update_maze_with_built_room(maze, updated_room)
 
-
-  end)
-maze
-end
+def reset_visited_positions(maze, start_position) do
+    %Maze{maze | visited_positions:
+               [ Maze.pos(Enum.at(start_position,0),Enum.at(start_position,1))]
+         }
+  end
 
 
 def solve(maze) do
