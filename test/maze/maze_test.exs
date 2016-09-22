@@ -58,4 +58,32 @@ defmodule MazeTest do
     assert  List.first(solved_maze.solve_path) == %Position{x: 8, y: 9}
   end
 
+  test "Resets visits_from for rooms. " ,  context do
+     maze_with_reset_room_visits  = Maze.initialize()
+                                 |> Maze.set_goal_and_start( [8,9], [2, 6])
+                                 |> Maze.build
+                                 |> Maze.reset_rooms_visits_from
+
+     assert Enum.all?(maze_with_reset_room_visits.rooms, fn r ->
+      Enum.empty? r.visits_from
+     end)
+  end
+
+  test "Resets visited_positions for maze. " ,  context do
+       maze_with_reset_visited_positions  =  Maze.initialize()
+                                          |> Maze.set_goal_and_start( [8,9], [2, 6])
+                                          |> Maze.build
+                                          |> Maze.reset_visited_positions([4, 5])
+
+       assert maze_with_reset_visited_positions.visited_positions == [%Maze.Position{x: 4, y: 5}]
+   end
+
+   test "Sets build and solve path states for maze." ,  context do
+       maze_with_set_path_states  =  Maze.initialize()
+                                  |> Maze.set_build_and_solve_path_state
+
+       assert is_pid  maze_with_set_path_states.build_path_state_pid
+       assert is_pid  maze_with_set_path_states.solve_path_state_pid
+   end
+
 end

@@ -241,6 +241,13 @@ def reset_visited_positions(maze, start_position ) do
          }
   end
 
+def set_build_and_solve_path_state maze do
+  {:ok, build_path_state_pid} = Path.start_link(maze, :build)
+  {:ok, solve_path_state_pid} = Path.start_link(maze, :solve)
+
+   %Maze{ maze | build_path_state_pid: build_path_state_pid,
+                 solve_path_state_pid: solve_path_state_pid }
+end
 
 def solve(maze) do
   # reset_rooms_visits_from(maze)

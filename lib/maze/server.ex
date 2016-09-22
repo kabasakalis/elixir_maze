@@ -86,26 +86,18 @@ defmodule Maze.Server do
     maze_server_state
   ) do
   maze =
-    Maze.initialize( rows, columns, name )
+       Maze.initialize( rows, columns, name )
     |> Maze.set_goal_and_start( goal_position, start_position )
     |> Maze.build
     |> Maze.reset_rooms_visits_from
     |> Maze.reset_visited_positions( start_position )
     |> Maze.solve
-
-  {:ok, build_path_state_pid} = Path.start_link(maze, :build)
-  {:ok, solve_path_state_pid} = Path.start_link(maze, :solve)
-
-  maze = %Maze{ maze | build_path_state_pid: build_path_state_pid,
-    solve_path_state_pid: solve_path_state_pid }
+    |> Maze.set_build_and_solve_path_state
 
 
-
-  if Mix.env != :test do
-    Canvas.GUI.start_link(canvas_options(maze, paint_mode, paint_interval))
-  end
-
-
+    if Mix.env != :test do
+      Canvas.GUI.start_link(canvas_options(maze, paint_mode, paint_interval))
+    end
 
   new_maze_server_state =  %{ maze_server_state | mazes: [maze |  maze_server_state.mazes] }
   # Logger.info "Mazes: #{inspect(new_maze_server_state.mazes)}\n"
