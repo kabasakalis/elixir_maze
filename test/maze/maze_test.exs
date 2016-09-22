@@ -33,8 +33,9 @@ defmodule MazeTest do
   test "Sets start and goal positions." ,  context do
     # Default goal_position
     default_maze2 = Maze.initialize()
-    default_maze2 = Maze.set_goal_and_start default_maze2
+    default_maze2 = Maze.set_goal_and_start default_maze2, nil, nil
     assert default_maze2.goal_position == %Position{x: 10, y: 10}
+    assert default_maze2.start_position != nil
 
     #Set start_position and goal_position
     maze2 = Maze.initialize()

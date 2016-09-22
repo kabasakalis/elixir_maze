@@ -56,7 +56,7 @@ defmodule ElixirMaze do
           #     [name: Turtles.TurtleSupervisor, strategy: :simple_one_for_one] ]
           # ),
           # worker(Maze.Canvas, [built_maze,{@width, @height}, [name: Maze.Canvas]]),
-          worker(Maze.Server, [test: 10 ]),
+          worker(Maze.Server, []),
           # worker(
           #   Maze.Clock,
           #

@@ -51,6 +51,10 @@ require Logger
                  columns \\ @columns,
                  name \\ "maze_#{rows}x#{columns}"
                ) do
+
+               rows = rows || @rows
+               columns = columns || @columns
+               name = name || "#{rows}x#{columns}"
     start_position = pos( Enum.take_random(1..columns,1) |> List.first,
       Enum.take_random(1..rows,1) |> List.first  )
      room_positions =
@@ -65,7 +69,6 @@ require Logger
       }
        maze
   end
-
 
   def go_back_to_previous_visited_room(maze)  do
     maze = if (length(maze.visited_positions) >= 1) do
@@ -92,7 +95,6 @@ require Logger
 
   def room(maze, position) do
     Enum.find(maze.rooms, fn(r) -> r.position == position end)
-    # maze.find_room position unless position.nil?
   end
 
   def current_room(maze) do
@@ -146,7 +148,7 @@ require Logger
   end
 
 
-  def set_goal_and_start(maze, goal_position \\ nil , start_position \\ nil) do
+  def set_goal_and_start(maze, goal_position, start_position) do
 
    start_position = if start_position do
      pos(Enum.at(start_position,0),Enum.at(start_position,1))
@@ -233,7 +235,7 @@ end
   end
 
 
-def reset_visited_positions(maze, start_position) do
+def reset_visited_positions(maze, start_position ) do
     %Maze{maze | visited_positions:
                [ Maze.pos(Enum.at(start_position,0),Enum.at(start_position,1))]
          }
