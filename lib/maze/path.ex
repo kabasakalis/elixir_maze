@@ -8,12 +8,9 @@ defmodule Maze.Path  do
               previous_position: nil,
               previous_room: nil
 
-    def empty do
-      %__MODULE__{ }
-    end
+
     # Client API
     def start_link(maze, path_type) do
-      # Agent.start_link(fn  -> init(maze) end, name: __MODULE__)
       Agent.start_link(fn  -> init(maze, path_type) end )
     end
 
@@ -37,12 +34,11 @@ defmodule Maze.Path  do
                                 previous_position: new_previous_position,
                                 previous_room:  new_previous_room
                               }
-
         {state, new_state}
 
       end)
     end
-    #
+
     # Server API
 
     defp init(maze, path_type) do

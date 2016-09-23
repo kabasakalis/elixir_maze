@@ -23,27 +23,6 @@ defmodule ElixirMaze do
   def start(_type, _args) do
     import Supervisor.Spec, warn: false
 
-
-   # built_maze = Maze.initialize() |>  Maze.set_goal_and_start( [7,8], [2, 3]) |> Maze.build
-   # build_path = built_maze.build_path |> Enum.reverse
-
-
-    # canvas_options = [
-    #   width: built_maze.columns * Painter.room_size * Painter.scale,
-    #   height: built_maze.rows * Painter.room_size * Painter.scale,
-    #   paint_interval: 500,
-    #   painter_module: Maze.Painter,
-    #   painter_state: %{maze: built_maze},
-    #   brushes: %{
-    #     black: {0, 0, 0, 255},
-    #     red: {150, 0, 0, 255},
-    #     green: {0, 150, 0, 255},
-    #     blue: {0, 0, 150, 255},
-    #     cyan: {0, 251, 255, 255},
-    #     yellow: {255, 255, 0, 255}
-    # ]
-
-
 # Define workers and child supervisors to be supervised
     children =
       if Mix.env != :test do
