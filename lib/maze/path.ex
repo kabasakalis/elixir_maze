@@ -34,7 +34,7 @@ defmodule Maze.Path  do
                                 previous_position: new_previous_position,
                                 previous_room:  new_previous_room
                               }
-        {state, new_state}
+        {new_state, new_state}
 
       end)
     end
