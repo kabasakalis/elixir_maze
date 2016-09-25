@@ -2,7 +2,7 @@ defmodule Maze.Server do
   require Logger
   use GenServer
   alias Maze.{Path}
-  # alias Maze.{ Position, Server }
+
   defstruct  mazes: []
 
   def canvas_options(maze, paint_mode \\ :solve, paint_interval \\ 100) do
@@ -22,20 +22,21 @@ defmodule Maze.Server do
       }
     ]
   end
+
   ## Client API
 
   @doc """
-  Starts the maze. :test
+  Starts the maze server.
   """
   def start_link(args \\ %__MODULE__{})  do
     GenServer.start_link(__MODULE__, args, timeout: :infinity, name: __MODULE__)
   end
 
   @default_create_args {:init,
-                        rows = 10,
-                        columns = 10,
+                        rows = 20,
+                        columns = 20,
                         name = nil,
-                        goal_position = [10, 10],
+                        goal_position = [20, 20],
                         start_position = [1, 1],
                         paint_mode = :solve,
                         paint_interval = 100
@@ -44,6 +45,21 @@ defmodule Maze.Server do
 
   def create_maze(args \\ @default_create_args) do
     GenServer.call(__MODULE__,args, :infinity)
+  end
+
+
+
+
+  def create_mazes(n, args \\ @default_create_args)
+
+  def create_mazes( n, args ) when (is_integer(n) and n > 0) do
+      Enum.each((1..n), fn i ->
+        create_maze args
+      end)
+  end
+
+  def create_mazes(_, _) do
+    {:error, "You must create at least one maze."}
   end
 
   # @doc """
@@ -85,6 +101,8 @@ defmodule Maze.Server do
     _from,
     maze_server_state
   ) do
+
+
   maze =
        Maze.initialize( rows, columns, name )
     |> Maze.set_goal_and_start( goal_position, start_position )
@@ -100,7 +118,6 @@ defmodule Maze.Server do
     end
 
   new_maze_server_state =  %{ maze_server_state | mazes: [maze |  maze_server_state.mazes] }
-  # Logger.info "Mazes: #{inspect(new_maze_server_state.mazes)}\n"
   {:reply, maze,  new_maze_server_state}
   end
 
