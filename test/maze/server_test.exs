@@ -8,16 +8,7 @@ defmodule ServerTest do
     :ok
   end
 
-  setup do
-    {:ok, maze_server} = Maze.Server.start_link(%Maze.Server{})
-    [maze_server: maze_server]
-  end
-
-  test "Mazer Server starts", %{maze_server: maze_server} do
-    assert is_pid maze_server
-  end
-
-  test "Server creates maze.", %{maze_server: maze_server} do
+  test "Server creates maze." do
     maze =
       Maze.Server.create_maze(
         {

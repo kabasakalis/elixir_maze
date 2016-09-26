@@ -3,7 +3,6 @@ defmodule MazeTest do
   use ExUnit.Case, async: true
   alias Maze.Room
   alias Maze.Position
-  # doctest Maze.Room
   #
   setup_all context do
     IO.puts "Setting up : #{inspect(context[:case])}"

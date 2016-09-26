@@ -1,4 +1,8 @@
 defmodule Maze.Path  do
+  @moduledoc """
+  Holds state for build and solve path of a maze.
+  """
+
   alias Maze.{Room,Painter}
 
     defstruct maze: nil,
@@ -10,6 +14,7 @@ defmodule Maze.Path  do
 
 
     # Client API
+
     def start_link(maze, path_type) do
       Agent.start_link(fn  -> init(maze, path_type) end )
     end
@@ -18,8 +23,16 @@ defmodule Maze.Path  do
       Agent.get( agent_pid,fn state -> state end)
     end
 
+
+    @doc """
+      Moves the path's `current_position` forward,
+      and deletes the old one from
+      the path list.
+
+      Returns %Path{} struct.
+
+    """
     def move_to_next_position(agent_pid) do
-      # Agent.get_and_update(__MODULE__, fn state ->
       Agent.get_and_update(agent_pid, fn state ->
         new_previous_position = List.first state.path
         new_previous_room = Room.find_room(state.maze.rooms, new_previous_position)
@@ -56,7 +69,5 @@ defmodule Maze.Path  do
         previous_room: nil
       }
     end
-
-
 
 end

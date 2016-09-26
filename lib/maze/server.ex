@@ -1,4 +1,8 @@
 defmodule Maze.Server do
+  @moduledoc """
+  Provides an API to create one or more mazes.
+  """
+
   require Logger
   use GenServer
   alias Maze.{Path}
@@ -7,6 +11,7 @@ defmodule Maze.Server do
 
   def canvas_options(maze, paint_mode \\ :solve, paint_interval \\ 100) do
     [
+      title: 'Elixir Maze #{maze.rows} x #{maze.columns}',
       width: maze.columns * Maze.Painter.room_size * Maze.Painter.scale,
       height: maze.rows * Maze.Painter.room_size *Maze. Painter.scale,
       paint_interval: paint_interval,
@@ -26,7 +31,8 @@ defmodule Maze.Server do
   ## Client API
 
   @doc """
-  Starts the maze server.
+  Starts the maze server.The Supervisor calls this functions
+  when the application starts.
   """
   def start_link(args \\ %__MODULE__{})  do
     GenServer.start_link(__MODULE__, args, timeout: :infinity, name: __MODULE__)
@@ -42,43 +48,67 @@ defmodule Maze.Server do
                         paint_interval = 100
                         }
 
+  @doc """
+  Creates a maze. You can skip the arguments in which
+  case @default_create_args will be passed.`paint_mode`
+  will solve the maze but only paint the building of the maze,
+  not the solved path.Solved path is painted with `paint_mode`
+  set to `:solve`.`paint_interval` is the time interval in
+  milliseconds for the GUI frame rate.
+
+  Returns %Maze{} struct.
+
+  ## Examples
+
+      iex> Maze.Server.create_maze
+      iex> Maze.Server.create_maze({:init,
+                        rows = 30,
+                        columns = 20,
+                        name = nil,
+                        goal_position = [15, 10],
+                        start_position = [1, 1],
+                        paint_mode = :build,
+                        paint_interval = 100
+                        })
+
+  """
 
   def create_maze(args \\ @default_create_args) do
     GenServer.call(__MODULE__,args, :infinity)
   end
 
 
+  @doc """
+  Concurrently creates and solves a number of mazes,then paints their path.
 
+  ## Examples
 
+      iex> Maze.Server.create_mazes 10
+      iex> Maze.Server.create_mazes(10, {:init,
+                        rows = 30,
+                        columns = 20,
+                        name = nil,
+                        goal_position = [15, 10],
+                        start_position = [1, 1],
+                        paint_mode = :build,
+                        paint_interval = 100
+                        })
+  Returns `:ok` if mazes were creates successfully.
+
+  """
   def create_mazes(n, args \\ @default_create_args)
 
   def create_mazes( n, args ) when (is_integer(n) and n > 0) do
       Enum.each((1..n), fn i ->
-        create_maze args
+        Task.start_link(fn ->
+         create_maze args
+        end)
       end)
   end
 
   def create_mazes(_, _) do
     {:error, "You must create at least one maze."}
   end
-
-  # @doc """
-  # Looks up the bucket pid for `name` stored in `server`.
-  #
-  # Returns `{:ok, pid}` if the bucket exists, `:error` otherwise.
-  # """
-  # def lookup(server, name) do
-    #   GenServer.call(server, {:lookup, name})
-    # end
-
-    # @doc """
-    # Ensures there is a bucket associated to the given `name` in `server`.
-    # """
-    # def create(server, name) do
-      #   GenServer.cast(server, {:create, name})
-      # end
-
-
 
   ## Server Callbacks
 
@@ -117,7 +147,8 @@ defmodule Maze.Server do
       Canvas.GUI.start_link(canvas_options(maze, paint_mode, paint_interval))
     end
 
-  new_maze_server_state =  %{ maze_server_state | mazes: [maze |  maze_server_state.mazes] }
+  new_maze_server_state =  %{ maze_server_state | mazes:
+                             [maze |  maze_server_state.mazes] }
   {:reply, maze,  new_maze_server_state}
   end
 

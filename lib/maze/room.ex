@@ -1,39 +1,28 @@
 defmodule Maze.Room do
+  @moduledoc """
+  Functions that manipulate room state.
+  """
 
   defstruct position: %Maze.Position{}, visits_from: [], available_exits: [], used_exits: []
 
 
-  @doc ~S"""
-    Parses the given `line` into a command.
+  @doc """
+      Finds the room at position x (row), y (column).
+      Position struct also supported as argument.
+      `rooms` is the maze's rooms.
 
-    ## Examples
+      Returns %Room{} struct.
 
-        iex> 1+1
-        2
-
-    """
+  """
 
   def find_room(rooms, x, y) do
    Enum.find(rooms, fn(room) ->
-                    (room.position.x == x) && (room.position.y ==y ) end)
+                    (room.position.x == x) && (room.position.y == y ) end)
   end
-
-   @doc ~S"""
-    Parses the given `line` into a command.
-
-    ## Examples
-
-        iex> 1+1
-        2
-
-    """
-
-
 
   def find_room(rooms, position) do
    Enum.find(rooms, fn(room) -> room.position == position end)
   end
-
 
   def visited?(room) do
     Enum.any? room.visits_from
@@ -43,6 +32,7 @@ defmodule Maze.Room do
   def all_rooms_visited?(rooms)  do
     Enum.all?(rooms, fn(room) ->  visited?(room) end )
   end
+
 
   def times_used_to_exits(room) do
    Enum.group_by(room.available_exits, fn(exit) ->
