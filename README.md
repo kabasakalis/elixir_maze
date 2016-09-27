@@ -11,7 +11,7 @@ Elixir Port of my [ruby-maze repo.]( https://github.com/drumaddict/ruby-maze)
 3. Create and solve a default 20 x 20 maze simply with
    ```elixir
    Maze.Server.create_maze
-    ```
+   ```
 4. Create and solve a maze with custom options  with
     ```elixir
     Maze.Server.create_maze({:init,
