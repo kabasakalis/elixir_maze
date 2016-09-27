@@ -23,7 +23,8 @@ defmodule Maze.Server do
         green: {0, 150, 0, 255},
         blue: {0, 0, 150, 255},
         cyan: {0, 251, 255, 255},
-        yellow: {255, 255, 0, 255}
+        yellow: {255, 255, 0, 255},
+        grey: {146, 166, 173, 255}
       }
     ]
   end
@@ -74,7 +75,7 @@ defmodule Maze.Server do
   """
 
   def create_maze(args \\ @default_create_args) do
-    GenServer.call(__MODULE__,args, :infinity)
+    GenServer.call(__MODULE__, args, :infinity)
   end
 
 

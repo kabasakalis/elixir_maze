@@ -67,12 +67,18 @@ defmodule Maze.Painter do
       end
 
       paint_solve_path(state[:maze], canvas, solve_path_state)
-      if (solve_path_state.current_position != state[:maze].goal_position ), do:
-         Path.move_to_next_position(solve_path_state_pid), else:
+      if (solve_path_state.current_position != state[:maze].goal_position ) do
+         Path.move_to_next_position(solve_path_state_pid)
+      else
          paint_position(canvas,
                        Maze.room(state[:maze],
                        solve_path_state.current_position),
-                       :yellow)
+                       :yellow,
+                       round(@room_size/4));
+
+
+      end
+
     end
   end
 
@@ -92,10 +98,10 @@ defmodule Maze.Painter do
     room_canvas_coords = to_canvas_coordinates({current_room.position.x,
       current_room.position.y})
     clear_walls(canvas, current_room, :black)
-    paint_position(canvas, current_room, :yellow)
+    paint_position(canvas, current_room, :yellow, round(@room_size/4))
 
     previous_room = Maze.room(maze,build_path_state.previous_position)
-    if previous_room, do: paint_position(canvas, previous_room, :black)
+    if previous_room, do: paint_position(canvas, previous_room, :black, round(@room_size/4))
   end
 
 
@@ -108,19 +114,22 @@ defmodule Maze.Painter do
       room_canvas_coords = to_canvas_coordinates({current_room.position.x,
         current_room.position.y})
 
-      paint_position(canvas, current_room, :yellow)
+      paint_position(canvas, current_room, :yellow, round(@room_size/4))
       paint_room(canvas, {start_room.position.x,start_room.position.y}
       |> to_canvas_coordinates, :red)
       paint_room(canvas, {goal_room.position.x,goal_room.position.y}
       |> to_canvas_coordinates, :blue)
 
     previous_room = Maze.room(maze,solve_path_state.previous_position)
-    if previous_room, do: paint_position(canvas, previous_room, :black)
+    if previous_room do
+      paint_position(canvas, previous_room, :black, round(@room_size/4))
+      paint_position(canvas, previous_room, :grey, round(@room_size/9))
+    end
 
   end
 
 
-  defp paint_position(canvas, room, color ) do
+  defp paint_position(canvas, room, color, radius) do
     pointer_x = to_canvas_coordinate(room.position.x)
     pointer_y = to_canvas_coordinate(room.position.y)
     pointer_upper_right_corner =
@@ -129,8 +138,9 @@ defmodule Maze.Painter do
 
    Brush.draw_circle(
     canvas,
-    {pointer_x + round( (@room_size / 2)), pointer_y + round((@room_size / 2))},
-    round(@room_size/4),
+    {pointer_x + round( (@room_size / 2)),
+     pointer_y + round((@room_size / 2))},
+    radius,
     color
     )
   end

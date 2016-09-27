@@ -47,6 +47,10 @@ defmodule Maze  do
                  name \\ "maze_#{rows}x#{columns}"
                ) do
 
+    Logger.info "Maze #{rows} x #{columns} now is being initialized .\n"
+    Logger.info "#{rows * columns} rooms will be built.\n"
+    Logger.info "Please wait.\n"
+
     rows = rows || @rows
     columns = columns || @columns
     name = name || "#{rows}x#{columns}"
@@ -198,6 +202,8 @@ defmodule Maze  do
     build(updated_maze)
     else
      true ->
+
+       Logger.info "Please wait.\n"
        Logger.info "Maze built in  #{inspect(Enum.count(maze.build_path))} steps.\n"
        Logger.info "BUILD PATH: #{inspect(Enum.map(maze.build_path, fn p -> {p.x, p.y} end)
        |> Enum.reverse)}\n"
@@ -272,6 +278,7 @@ defmodule Maze  do
       solve(updated_maze)
     else
       true ->
+         Logger.info "Please wait.\n"
          Logger.info "Maze solved in  #{inspect(Enum.count(maze.solve_path))} steps.\n"
          Logger.info "SOLVE PATH: #{inspect(Enum.map(maze.solve_path, fn p ->
            {p.x ,p.y}
