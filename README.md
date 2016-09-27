@@ -9,10 +9,12 @@ Elixir Port of my [ruby-maze repo.]( https://github.com/drumaddict/ruby-maze)
 1. Clone the repo and run in the root of the project  `mix deps.get` to download the dependencies.
 2. Run  `iex -S mix` to start the `Maze.Server`
 3. Create and solve a default 20 x 20 maze simply with
+
    ```elixir
    Maze.Server.create_maze
    ```
 4. Create and solve a maze with custom options  with
+
     ```elixir
     Maze.Server.create_maze({:init,
                             rows = 35,
