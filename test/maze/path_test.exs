@@ -10,13 +10,13 @@ defmodule PathTest do
       Maze.Server.create_maze(
         {
           :init,
-          rows = 15,
-          columns = 20,
-          name ='My MazeLKsa',
-          goal_position = [20,15],
-          start_position = [1,1],
-          paint_mode = :build,
-          paint_interval = 200
+          15,
+          20,
+          'My Maze',
+          [20,15],
+          [1,1],
+          :build,
+          200
         })
 
       build_path_state =  Maze.Path.get_path(maze.build_path_state_pid)
@@ -37,7 +37,7 @@ defmodule PathTest do
     assert solve_path_state.path == Enum.reverse maze.solve_path
   end
 
-  test "Path moves to next position.", %{maze: maze, build_path_state_pid: build_path_state_pid, solve_path_state_pid: solve_path_state_pid} do
+  test "Path moves to next position.", %{maze: maze, solve_path_state_pid: solve_path_state_pid} do
     new_path_state = Maze.Path.move_to_next_position(solve_path_state_pid)
     assert new_path_state.current_position == maze.solve_path |> Enum.reverse |> Enum.at(1)
   end

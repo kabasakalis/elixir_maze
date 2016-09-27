@@ -4,7 +4,7 @@ defmodule Maze.Painter do
   """
   require Logger
   alias Canvas.GUI.Brush
-  alias Maze.{Room, Position, Canvas, Path}
+  alias Maze.{Room, Path}
 
   @room_size 26
   @scale 1
@@ -93,27 +93,18 @@ defmodule Maze.Painter do
   end
 
   defp paint_build_path(maze, canvas, build_path_state) do
-    current_position = build_path_state.current_position
     current_room = Room.find_room(maze.rooms, build_path_state.current_position)
-    room_canvas_coords = to_canvas_coordinates({current_room.position.x,
-      current_room.position.y})
     clear_walls(canvas, current_room, :black)
     paint_position(canvas, current_room, :yellow, round(@room_size/4))
-
     previous_room = Maze.room(maze,build_path_state.previous_position)
     if previous_room, do: paint_position(canvas, previous_room, :black, round(@room_size/4))
   end
 
 
   defp paint_solve_path(maze, canvas, solve_path_state) do
-
-      current_position = solve_path_state.current_position
       current_room = Room.find_room(maze.rooms, solve_path_state.current_position)
       start_room = Room.find_room(maze.rooms, maze.start_position)
       goal_room = Room.find_room(maze.rooms, maze.goal_position)
-      room_canvas_coords = to_canvas_coordinates({current_room.position.x,
-        current_room.position.y})
-
       paint_position(canvas, current_room, :yellow, round(@room_size/4))
       paint_room(canvas, {start_room.position.x,start_room.position.y}
       |> to_canvas_coordinates, :red)
@@ -132,16 +123,12 @@ defmodule Maze.Painter do
   defp paint_position(canvas, room, color, radius) do
     pointer_x = to_canvas_coordinate(room.position.x)
     pointer_y = to_canvas_coordinate(room.position.y)
-    pointer_upper_right_corner =
-    {round( pointer_x + (@room_size / 2) - (@current_room_pointer_size / 2) ),
-     round(pointer_y + (@room_size / 2) - (@current_room_pointer_size / 2)) }
-
-   Brush.draw_circle(
-    canvas,
-    {pointer_x + round( (@room_size / 2)),
-     pointer_y + round((@room_size / 2))},
-    radius,
-    color
+    Brush.draw_circle(
+      canvas,
+      {pointer_x + round( (@room_size / 2)),
+       pointer_y + round((@room_size / 2))},
+      radius,
+      color
     )
   end
 
@@ -178,7 +165,7 @@ defmodule Maze.Painter do
   end
 
 
-  defp paint_wall(canvas, position = {x, y}, :left, color, length)  do
+  defp paint_wall(canvas, {x, y}, :left, color, length)  do
     upper_left = if (length == :small), do: { x, y + @wall_thickness}, else: {x, y}
     size  = if (length == :small), do:
       {@wall_thickness, @room_size - (2 * @wall_thickness)},
@@ -193,7 +180,7 @@ defmodule Maze.Painter do
   end
 
 
-  defp paint_wall(canvas, position = {x, y}, :right, color, length)  do
+  defp paint_wall(canvas, {x, y}, :right, color, length)  do
     upper_left = if (length == :small), do:
       { (x + @room_size -  @wall_thickness ), y + @wall_thickness},
     else: { (x + @room_size -  @wall_thickness ), y}
@@ -210,7 +197,7 @@ defmodule Maze.Painter do
     )
   end
 
-  defp paint_wall(canvas, position = {x, y}, :up, color, length)  do
+  defp paint_wall(canvas, {x, y}, :up, color, length)  do
     upper_left = if (length == :small), do:
       { x + @wall_thickness, y}, else: { x, y}
 
@@ -226,7 +213,7 @@ defmodule Maze.Painter do
     )
   end
 
-  defp paint_wall(canvas, position = {x, y}, :down, color, length)  do
+  defp paint_wall(canvas, {x, y}, :down, color, length)  do
     upper_left = if (length == :small), do:
       {x + @wall_thickness, y + @room_size - @wall_thickness},
     else: {x, y + @room_size - @wall_thickness}

@@ -9,7 +9,7 @@ defmodule MazeTest do
     :ok
   end
 
-  test "Initializes a maze." ,  context do
+  test "Initializes a maze."  do
     default_maze = Maze.initialize()
     assert default_maze.rows == Maze.rows
     assert default_maze.columns == Maze.columns
@@ -29,7 +29,7 @@ defmodule MazeTest do
   end
 
 
-  test "Sets start and goal positions." ,  context do
+  test "Sets start and goal positions."  do
     # Default goal_position
     default_maze2 = Maze.initialize()
     default_maze2 = Maze.set_goal_and_start default_maze2, nil, nil
@@ -45,19 +45,19 @@ defmodule MazeTest do
   end
 
 
-  test "Builds a maze." ,  context do
+  test "Builds a maze."  do
     built_maze = Maze.initialize() |>  Maze.set_goal_and_start( [7,8], [2, 3]) |> Maze.build
     assert  Room.all_rooms_visited?(built_maze.rooms) == true
     assert  Enum.count(built_maze.build_path) > 1
   end
 
-  test "Solves a maze." ,  context do
+  test "Solves a maze."  do
     solved_maze = Maze.initialize() |>  Maze.set_goal_and_start( [8,9], [2, 6]) |> Maze.build |> Maze.solve
     assert  Enum.count(solved_maze.solve_path) >= 1
     assert  List.first(solved_maze.solve_path) == %Position{x: 8, y: 9}
   end
 
-  test "Resets visits_from for rooms. " ,  context do
+  test "Resets visits_from for rooms. "  do
      maze_with_reset_room_visits  = Maze.initialize()
                                  |> Maze.set_goal_and_start( [8,9], [2, 6])
                                  |> Maze.build
@@ -68,7 +68,7 @@ defmodule MazeTest do
      end)
   end
 
-  test "Resets visited_positions for maze. " ,  context do
+  test "Resets visited_positions for maze. "  do
        maze_with_reset_visited_positions  =  Maze.initialize()
                                           |> Maze.set_goal_and_start( [8,9], [2, 6])
                                           |> Maze.build
@@ -77,7 +77,7 @@ defmodule MazeTest do
        assert maze_with_reset_visited_positions.visited_positions == [%Maze.Position{x: 4, y: 5}]
    end
 
-   test "Sets build and solve path states for maze." ,  context do
+   test "Sets build and solve path states for maze."  do
        maze_with_set_path_states  =  Maze.initialize()
                                   |> Maze.set_build_and_solve_path_state
 

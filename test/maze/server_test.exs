@@ -13,13 +13,13 @@ defmodule ServerTest do
       Maze.Server.create_maze(
         {
           :init,
-          rows = 15,
-          columns = 20,
-          name ='My Maze',
-          goal_position = [20,15],
-          start_position = [1,1],
-          paint_mode = :build,
-          paint_interval = 200
+          15,
+          20,
+          'My Maze',
+          [20,15],
+          [1,1],
+          :build,
+          200
         })
 
       assert maze.rows == 15

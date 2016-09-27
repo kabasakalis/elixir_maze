@@ -8,7 +8,7 @@ defmodule RoomTest do
     IO.puts "Setting up : #{inspect(context[:case])}"
     :ok
   end
-  setup context do
+  setup do
 
     room_1 =  %Maze.Room{ position: %Maze.Position{x: 1, y: 1},
                           visits_from: [:down, :right, :right, :right],
