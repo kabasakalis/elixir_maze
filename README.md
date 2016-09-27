@@ -1,6 +1,8 @@
 [![Build Status](https://travis-ci.org/drumaddict/elixir-maze.svg?branch=master)](https://travis-ci.org/drumaddict/elixir-maze)
 # Elixir Maze
 ----
+### Overview
+Elixir Port of my [ruby-maze repo.]( https://github.com/drumaddict/ruby-maze)
 
 ## Usage
 
@@ -42,6 +44,7 @@
   Maze.Server.create_mazes 50, options
   ```
   I had no problem with 300 mazes, see screenshot below.
+
 
 
 ## License
