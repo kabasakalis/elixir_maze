@@ -1,7 +1,7 @@
 [![Build Status](https://travis-ci.org/drumaddict/elixir-maze.svg?branch=master)](https://travis-ci.org/drumaddict/elixir-maze)
 # Elixir Maze
 ----
-### Overview
+## Overview
 Elixir Port of my [ruby-maze repo.]( https://github.com/drumaddict/ruby-maze)
 
 ## Usage
@@ -50,7 +50,7 @@ Elixir Port of my [ruby-maze repo.]( https://github.com/drumaddict/ruby-maze)
 
 
 ## License
-The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
+The project is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
 
 ###### A 35x73 Maze being solved.
 ![screenshot](https://github.com/drumaddict/elixir-maze/blob/master/screenshots/maze_solved.png)
