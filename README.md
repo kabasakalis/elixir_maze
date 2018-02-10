@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/drumaddict/elixir-maze.svg?branch=master)](https://travis-ci.org/kabasakalis/elixir-maze)
+[![Build Status](https://travis-ci.org/drumaddict/elixir-maze.svg?branch=master&invalidate=1)](https://travis-ci.org/kabasakalis/elixir-maze)
 # Elixir Maze
 ----
 ## Overview
