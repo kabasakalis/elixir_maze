@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/drumaddict/elixir-maze.svg?branch=master&invalidate=1)](https://travis-ci.org/kabasakalis/elixir-maze)
+[![Build Status](https://travis-ci.org/kabasakalis/elixir_maze.svg?branch=master&invalidate=1)](https://travis-ci.org/kabasakalis/elixir_maze)
 # Elixir Maze
 ----
 ## Overview
@@ -53,14 +53,14 @@ Elixir Port of my [ruby-maze repo.]( https://github.com/drumaddict/ruby-maze)
 The project is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
 
 ###### A 35x73 Maze being solved.
-![screenshot](https://github.com/drumaddict/elixir-maze/blob/master/screenshots/maze_solved.png)
+![screenshot](https://github.com/kabasakalis/elixir_maze/blob/master/screenshots/maze_solved.png)
 
 ###### A 35x73 Maze being built.
-![screenshot](https://github.com/drumaddict/elixir-maze/blob/master/screenshots/maze_built.png)
+![screenshot](https://github.com/kabasakalis/elixir_maze/blob/master/screenshots/maze_built.png)
 
 ###### Twenty  20x20 mazes concurrently solved.
-![screenshot](https://github.com/drumaddict/elixir-maze/blob/master/screenshots/mazes_20.png)
+![screenshot](https://github.com/kabasakalis/elixir_maze/blob/master/screenshots/mazes_20.png)
 
 ###### Three Hundred (300!)  20x20 mazes concurrently solved.
-![screenshot](https://github.com/drumaddict/elixir-maze/blob/master/screenshots/mazes_300.png)
+![screenshot](https://github.com/kabasakalis/elixir_maze/blob/master/screenshots/mazes_300.png)
 
